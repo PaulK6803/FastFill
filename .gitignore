@@ -1,0 +1,10 @@
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+
+# Ignore IDE-specific files (e.g., PyCharm, VSCode)
+.idea/
+.vscode/
+
+# Ignore macOS system files
+.DS_Store
