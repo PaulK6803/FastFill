@@ -1,3 +1,5 @@
+# häufig genutzte Texte wie Emails und andere, in die Zwischenablage zum einfachen einfügen, kopieren.
+
 import webbrowser
 from plyer import notification
 
@@ -16,6 +18,21 @@ from _internal.FastFill_addRemove import UiDialogAddRemove as DialogAddRemove
 from _internal.version import __version__
 
 import sys
+
+# def is_smartfill_running():
+#     for proc in psutil.process_iter(['pid', 'name']):
+#         try:
+#             # Check if process name matches 'SmartFill.exe'
+#             if proc.info['name'] == 'SmartFill.exe':
+#                 # If already running, show a message box with only an OK button
+#                 QMessageBox.information(None, "Already Running",
+#                                          "SmartFill läuft bereits im Hintergrund.",
+#                                          QMessageBox.StandardButton.Ok)
+#                 logging.info("SmartFill is already running. Exiting the application.")
+#                 sys.exit(0)  # Exit the program
+#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+#             pass
+#     return False
 
 
 isDialogShown = True
@@ -77,10 +94,7 @@ def check_for_update():
     }
 
     try:
-        response = requests.get("https://raw.githubusercontent.com/PaulK6803/FastFill/main/version.json",
-                                auth=HTTPBasicAuth(repo,
-                                                   password),
-                                headers=headers)
+        response = requests.get("https://raw.githubusercontent.com/PaulK6803/FastFill/main/version.json")
         response.raise_for_status()  # Ensure we catch HTTP errors
         data = response.json()
 
@@ -106,6 +120,8 @@ def check_for_update():
             else:
                 displayNotification("FastFill Update", f"Version {latest_version} ist verfügbar.", 5)
         else:
+            logging.info(f"Current installed version: {__version__}")
+            logging.info(f"Github version: {latest_version}")
             logging.info("Already up to date.")
             return None
     except Exception as e:
