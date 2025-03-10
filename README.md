@@ -10,9 +10,9 @@ FastFill is a Windows application built using Python and PyQt5, designed to [bri
 
 ## Installation
 
-To install FastFill, simply download the installer for Windows and run it.
+To install FastFill, simply download the installer for Windows from the Releases page and run it.
 
-- [Windows Installer](installer/MyAppInstaller.exe)
+- [Windows Installer](https://github.com/PaulK6803/FastFill/releases)
 
 ## Libraries Used
 
