@@ -1,5 +1,3 @@
-# häufig genutzte Texte wie Emails und andere, in die Zwischenablage zum einfachen einfügen, kopieren.
-
 import webbrowser
 from plyer import notification
 
