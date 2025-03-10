@@ -19,21 +19,6 @@ from _internal.version import __version__
 
 import sys
 
-# def is_smartfill_running():
-#     for proc in psutil.process_iter(['pid', 'name']):
-#         try:
-#             # Check if process name matches 'SmartFill.exe'
-#             if proc.info['name'] == 'SmartFill.exe':
-#                 # If already running, show a message box with only an OK button
-#                 QMessageBox.information(None, "Already Running",
-#                                          "SmartFill läuft bereits im Hintergrund.",
-#                                          QMessageBox.StandardButton.Ok)
-#                 logging.info("SmartFill is already running. Exiting the application.")
-#                 sys.exit(0)  # Exit the program
-#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-#             pass
-#     return False
-
 
 isDialogShown = True
 
