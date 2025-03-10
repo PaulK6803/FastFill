@@ -78,8 +78,8 @@ def check_for_update():
 
     try:
         response = requests.get("https://raw.githubusercontent.com/PaulK6803/FastFill/main/version.json",
-                                auth=HTTPBasicAuth("PaulK6803",
-                                                   "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"),
+                                auth=HTTPBasicAuth(repo,
+                                                   password),
                                 headers=headers)
         response.raise_for_status()  # Ensure we catch HTTP errors
         data = response.json()
