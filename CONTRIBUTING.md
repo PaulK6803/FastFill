@@ -7,7 +7,7 @@ We welcome contributions to MyApp! Here's how you can help:
 1. Fork the repository and create your branch from `main`.
 2. Make your changes and test thoroughly.
 3. Submit a pull request with a clear description of the changes.
-4. Ensure that your changes comply with the https:[LICENSE(LICENSE)] terms, particularly regarding the non-commercial use of the software.
+4. Ensure that your changes comply with the [license](LICENSE) terms, particularly regarding the non-commercial use of the software.
 
 ## License
 
