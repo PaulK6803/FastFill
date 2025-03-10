@@ -1,6 +1,6 @@
-# Contributing to MyApp
+# Contributing to FastFill
 
-We welcome contributions to MyApp! Here's how you can help:
+We welcome contributions to FastFill! Here's how you can help:
 
 ## How to Contribute
 
