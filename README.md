@@ -1,4 +1,6 @@
-FastFill is a cross-platform application built using Python and PyQt5, designed to [brief description of the app's purpose]. The application provides [list key features] and can be easily installed using the provided installer.
+# FastFill
+
+FastFill is a Windows application built using Python and PyQt5, designed to [brief description of the app's purpose]. The application provides [list key features] and can be easily installed using the provided installer.
 
 ## Features
 
@@ -8,10 +10,9 @@ FastFill is a cross-platform application built using Python and PyQt5, designed 
 
 ## Installation
 
-To install FastFill, simply download the installer for your platform and run it.
+To install FastFill, simply download the installer for Windows and run it.
 
 - [Windows Installer](installer/MyAppInstaller.exe)
-- [macOS Installer](installer/MyAppInstaller.dmg)
 
 ## Libraries Used
 
@@ -21,7 +22,7 @@ The following open-source libraries and tools have been used in this project:
   
 - **Requests**: A simple HTTP library for Python, making it easy to send HTTP requests. Requests is licensed under the Apache 2.0 license.
   
-- **Plyer**: A cross-platform Python library that provides a platform-independent API to access features such as notifications, battery status, and more. Plyer is licensed under the MIT license.
+- **Plyer**: A Python library that provides a platform-independent API to access features such as notifications, battery status, and more. Plyer is licensed under the MIT license.
   
 - **auto-py-to-exe**: A tool that converts Python scripts into standalone executables. auto-py-to-exe is licensed under the MIT license.
   
@@ -34,4 +35,3 @@ This project is licensed under the [Creative Commons Attribution-NonCommercial 4
 ## Contributing
 
 We welcome contributions to FastFill! If you'd like to contribute, please fork the repository and submit a pull request with your improvements or fixes. Ensure your contributions comply with the license terms.
-
