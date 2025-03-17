@@ -3,6 +3,7 @@
 # License Information
 
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.
+
 FastFill is a Windows application built using Python and PyQt5, designed to easily manage and copy frequently used texts, such as emails, templates, and more, directly to your clipboard for quick and convenient pasting.
 
 ## You are free to:
