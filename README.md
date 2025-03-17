@@ -17,6 +17,8 @@ To install FastFill, simply download the installer for Windows from the Releases
 
 - [Windows Installer](https://github.com/PaulK6803/FastFill/releases)
 
+---
+
 ## Contributing
 
 We welcome contributions to FastFill! If you'd like to contribute, please fork the repository and submit a pull request with your improvements or fixes. Ensure your contributions comply with the license terms.
