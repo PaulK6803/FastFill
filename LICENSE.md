@@ -50,7 +50,6 @@ If you appreciate this project and would like to support its development, you ca
 You can donate via the following platforms:
 
 - [GitHub Sponsors](https://github.com/sponsors/PaulK6803)
-- [Patreon](https://www.patreon.com/PaulK6803)
 
 Thank you for your support!
 
@@ -61,7 +60,7 @@ Thank you for your support!
 If you have any questions, suggestions, or feedback about the project, feel free to contact me:
 
 - **GitHub Profile**: [PaulK6803](https://github.com/PaulK6803)
-- **Email**: [paulkoch@example.com](mailto:paulkoch@example.com) *(Replace with your actual email if you prefer to share it)*
+- **Email**: [paulkoch@example.com](mailto:paul.koch_nds@t-online.de) *(Replace with your actual email if you prefer to share it)*
 
 
 
