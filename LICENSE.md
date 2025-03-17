@@ -26,9 +26,7 @@ The licensor cannot revoke these freedoms as long as you follow the terms of the
 - **No independent redistribution** — The source code may not be redistributed outside of the original repository without explicit permission. Modifications and improvements should be submitted as pull requests to the main project.
 
 ---
-
-
-
+---
 
 
 ## Libraries and Tools Used
