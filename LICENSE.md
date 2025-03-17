@@ -45,6 +45,8 @@ The following open-source libraries and tools have been used in this project:
   
 - **Inno Setup Compiler**: A Windows setup creation tool used to create the installer for FastFill. It is licensed under its own proprietary license. Please refer to the official website for full licensing details.
 
+- **Icons8**: Icons used in this project are provided by **[Icons8](https://icons8.com/)**. Please refer to their licensing terms for proper attribution.
+
 ---
 
 ## Donations
