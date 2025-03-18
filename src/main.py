@@ -835,11 +835,10 @@ class UiDialogMain(object):
         try:
             clipboard = QApplication.clipboard()
 
-            if self.listWidget.isVisible():
-                currentItem = self.listWidget.currentItem()
-                if currentItem:
-                    clipboard.setText(currentItem.text())
+            # Copy the content from QPlainTextEdit
+            clipboard.setText(self.plainTextEdit.toPlainText())
 
+            # Clear the clipboard after 10 seconds (if needed)
             QTimer.singleShot(10000, lambda: clipboard.clear())
         except Exception as e:
             logging.error(e)
