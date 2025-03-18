@@ -12,12 +12,12 @@ FastFill is a Windows application built using Python and PyQt5, designed to easi
 
 ## ✨ Features
 
-FastFill allows you to easily manage and copy frequently used texts, such as emails, templates, and more, directly to your clipboard for quick and convenient pasting.
+FastFill allows you to efficiently manage frequently used texts and copy them directly to your clipboard for quick pasting.
 
-- Create, delete, organize, and rename categories
-- Add, remove, reorder, and rename entries within each category
-- Customizable settings designed for an intuitive and user-friendly experience
-- A system tray icon for quick access to open, close, or restart the application
+- 🗂 **Organize categories** – Create, delete, rename, and organize them  
+- 📝 **Manage text entries** – Add, remove, reorder, and rename saved texts  
+- ⚙️ **Customizable settings** – Customizable settings designed for an intuitive and user-friendly experience
+- 🎛 **System tray integration** – Quickly open, close, or restart the app
 
 ## 📥 Installation
 
