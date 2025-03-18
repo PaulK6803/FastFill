@@ -1,8 +1,18 @@
 # FastFill
 
+## 🚀 Stable Version – Main Branch (Read-Only)
+
+This is the **`main` branch**, containing the **stable version** of FastFill.  
+✅ **This branch is protected** – only the repository owner can update it.  
+🛠️ **Contributions should be made in the `develop` branch.**
+
+---
+
+## 📌 About FastFill
+
 FastFill is a Windows application built using Python and PyQt5, designed to easily manage and copy frequently used texts - such as emails, templates, and more. It allows you to easily copy these texts to your clipboard for fast and efficient pasting, saving you time and effort.
 
-## Features
+## ✨ Features
 
 FastFill allows you to easily manage and copy frequently used texts, such as emails, templates, and more, directly to your clipboard for quick and convenient pasting.
 
@@ -11,7 +21,7 @@ FastFill allows you to easily manage and copy frequently used texts, such as ema
 - Customizable settings designed for an intuitive and user-friendly experience
 - A system tray icon for quick access to open, close, or restart the application
 
-## Installation
+## 📥 Installation
 
 To install FastFill, simply download the installer for Windows from the Releases page and run it.
 
@@ -19,16 +29,20 @@ To install FastFill, simply download the installer for Windows from the Releases
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-We welcome contributions to FastFill! If you'd like to contribute, please fork the repository and submit a pull request with your improvements or fixes. Ensure your contributions comply with the license terms.
+**🚫 Contributions cannot be made directly to `main`.**  
 
-**How to Contribute**
+🛠️ **To contribute, use the `develop` branch:**  
 
-1. Fork the repository and create your branch from `main`.
-2. Make your changes and test thoroughly.
-3. Submit a pull request with a clear description of the changes.
-4. Ensure that your changes comply with the [license](LICENSE.md) terms, particularly regarding the non-commercial use of the software.
+1. **Fork the repository** and create your feature branch from `develop`.  
+2. **Make your changes** and test them thoroughly.  
+3. **Submit a pull request (PR) to `develop`** with a clear description of your changes.  
+4. **Ensure your changes comply with the [license](LICENSE.md) terms**, particularly regarding non-commercial use.  
+
+🔄 Once changes in `develop` are tested and stable, the repository owner will merge them into `main`.  
+
+---
 
 **License**
 
