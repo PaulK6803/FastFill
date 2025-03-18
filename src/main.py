@@ -46,6 +46,15 @@ log_file = appData_path / "FastFill_app.log"
 documents_path = Path.home() / "Documents"
 old_config_file = documents_path / "FastFillConfig.ini"
 
+# Ensure the directory exists
+if not appData_path.exists():
+    logging.info(f"Creating directory: {appData_path}")
+    appData_path.mkdir(parents=True, exist_ok=True)
+
+if not log_file.exists():
+    # You could open the file to create it or add initial logging if needed
+    log_file.touch()  # This will create an empty log file
+
 current_section = None
 
 # Set up logging
@@ -55,10 +64,6 @@ logging.basicConfig(
     format='%(asctime)s - %(funcName)s - Line: %(lineno)d ---- %(levelname)s - %(message)s'
 )
 
-# Log file and new config file: check if they exist (if needed)
-if not log_file.exists():
-    # You could open the file to create it or add initial logging if needed
-    log_file.touch()  # This will create an empty log file
 
 # write log file
 try:
@@ -79,11 +84,6 @@ if old_config_file.exists():
 else:
     logging.info(f"Old config file not found: {old_config_file}")
 
-
-# Ensure the directory exists
-if not appData_path.exists():
-    logging.info(f"Creating directory: {appData_path}")
-    appData_path.mkdir(parents=True, exist_ok=True)
 
 if not config_file.exists():
     logging.info(f"Config file does not exist, creating: {config_file}")
