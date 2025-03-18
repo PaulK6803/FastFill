@@ -1,4 +1,4 @@
-# häufig genutzte Texte wie Emails und andere, in die Zwischenablage zum einfachen einfügen, kopieren.
+# Frequently used texts like emails and others, copied to the clipboard for easy pasting.
 
 import webbrowser
 
