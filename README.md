@@ -19,6 +19,9 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 - ⚙️ **Customizable settings** – Customizable settings designed for an intuitive and user-friendly experience
 - 🎛 **System tray integration** – Quickly open, close, or restart the app
 
+![FastFillShowcase](./images/FastFillShowcase.png)
+![FastFillShowcase](./images/FastFillShowcase2.png)
+
 ## 📥 Installation
 
 To install FastFill, simply download the installer for Windows from the Releases page and run it.
