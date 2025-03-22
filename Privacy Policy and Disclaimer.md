@@ -35,3 +35,48 @@ FastFill may use external resources (such as GitHub) to download updates. Howeve
 
 **5. Changes to this Disclaimer**  
 This disclaimer may be updated at any time without prior notice. Please review the latest version regularly on GitHub.
+
+
+
+---
+---
+
+
+# Datenschutzerklärung und Haftungsausschluss für FastFill
+
+## Datenschutzerklärung
+
+**1. Allgemeine Informationen**  
+FastFill erhebt, verarbeitet oder speichert keine personenbezogenen Daten. Wir respektieren deine Privatsphäre und deine Datenrechte.
+
+**2. Keine personenbezogenen Daten**  
+FastFill sammelt keine persönlichen Informationen wie Namen, E-Mail-Adressen, IP-Adressen oder andere identifizierende Informationen. Es werden keine Daten über die Nutzer verarbeitet oder gespeichert.
+
+**3. Internetverbindung und Updates**  
+FastFill nutzt eine Internetverbindung, um regelmäßig nach Updates auf GitHub zu suchen. Dieser Vorgang dient ausschließlich dazu, sicherzustellen, dass du die neueste Version der Anwendung verwendest. Es werden keine Daten über die Nutzung der App oder den Benutzer selbst an Dritte übermittelt. Der Zugriff auf GitHub erfolgt nur, um Informationen zu verfügbaren Updates abzurufen und ist für die Funktion der App notwendig. Es werden keine Nutzerdaten übertragen.
+
+**4. Sicherheit**  
+Da FastFill keine personenbezogenen Daten verarbeitet, müssen keine solchen Daten gespeichert werden. Wir stellen jedoch sicher, dass die Internetverbindung sicher und verschlüsselt erfolgt, um potenzielle Sicherheitsrisiken zu minimieren.
+
+**5. Änderungen dieser Datenschutzerklärung**  
+Sollten sich Änderungen an dieser Datenschutzerklärung ergeben, wird die aktuelle Version auf GitHub und innerhalb der App verfügbar gemacht.
+
+---
+
+## Haftungsausschluss
+
+**1. Allgemeine Haftung**  
+FastFill wird "so wie es ist" bereitgestellt. Die Nutzung der App erfolgt auf eigenes Risiko. Wir übernehmen keine Haftung für direkte oder indirekte Schäden, die aus der Nutzung der Software resultieren, einschließlich, aber nicht beschränkt auf Datenverlust, Systemfehler oder Schäden an Hardware.
+
+**2. Keine Garantie**  
+Es wird keine Garantie für die fehlerfreie Funktionsweise von FastFill gegeben. Obwohl wir uns bemühen, die App regelmäßig zu aktualisieren und zu verbessern, können wir keine vollständige Fehlerfreiheit garantieren. FastFill wird kontinuierlich weiterentwickelt, und Updates werden regelmäßig veröffentlicht, aber es kann nicht ausgeschlossen werden, dass Fehler auftreten.
+
+**3. Nutzung auf eigene Verantwortung**  
+Der Nutzer ist verantwortlich für die ordnungsgemäße Nutzung der App. Wir empfehlen, regelmäßig Backups wichtiger Daten zu erstellen, um potenziellen Datenverlust vorzubeugen.
+
+**4. Keine Haftung für Inhalte von Drittanbietern**  
+FastFill kann externe Ressourcen (wie GitHub) verwenden, um Updates herunterzuladen. Wir übernehmen jedoch keine Haftung für Inhalte, die von Drittanbietern bereitgestellt werden, oder für Änderungen an diesen Ressourcen.
+
+**5. Änderungen des Haftungsausschlusses**  
+Dieser Haftungsausschluss kann jederzeit ohne vorherige Ankündigung geändert werden. Bitte überprüfe regelmäßig die neueste Version auf GitHub.
+
