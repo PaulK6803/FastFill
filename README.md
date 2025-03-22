@@ -63,3 +63,10 @@ We follow a **Code of Conduct** that encourages respectful and inclusive contrib
 
 📌 **Reminder:** **All contributions should be made to the `develop` branch**, not `main`.  
 🔄 **The `main` branch only contains stable versions after successful testing in `develop`.** 🚀
+
+---
+
+
+## Legal Information
+
+For details on privacy and terms of use, please refer to the [Privacy Policy and Disclaimer](Privacy_Policy_and_Disclaimer.md).
