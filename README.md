@@ -54,3 +54,8 @@ By submitting a pull request, you agree that your contributions will be licensed
 **Code of Conduct**
 
 We follow a code of conduct that encourages respectful and inclusive contributions. Please make sure to engage in a manner that fosters collaboration and respect.
+
+**Legal Information**
+
+For details on privacy and terms of use, please refer to the [Privacy Policy and Disclaimer](Privacy_Policy_and_Disclaimer.md).
+
