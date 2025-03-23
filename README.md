@@ -1,7 +1,6 @@
 # FastFill
 
 This is the **`main` branch**, containing the **stable version** of FastFill.  
-✅ **This branch is protected** – only the repository owner can update it.  
 🛠️ **Contributions should be made in the `develop` branch.**
 
 ---
