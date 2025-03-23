@@ -1,50 +1,41 @@
-# Frequently used texts like emails and others, copied to the clipboard for easy pasting.
-
+# FastFill is a Windows application built using Python and PyQt5,
+# designed to easily manage and copy frequently used texts - such as emails, templates, and more.
+# It allows you to easily copy these texts to your clipboard for fast and efficient pasting, saving you time and effort.
+import subprocess
 import webbrowser
+import winreg
 
-from PyQt5.QtGui import QBrush, QColor
 from plyer import notification
 from pathlib import Path
+import configparser
+import os
+import sys
+
+from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtCore import QTimer, Qt, QSize, QPoint, QCoreApplication, QTranslator, QSettings
+from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
+
+from pyqttoast import Toast, ToastPreset, ToastPosition
 
 import requests
 import logging
-from PyQt5.QtCore import QTimer, Qt, QStandardPaths, QProcess, QSize
-from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame
-from PyQt5 import QtCore, QtGui, QtWidgets
-import configparser
-import os
-
-from PyQt5.QtWidgets import QMessageBox
-from requests.auth import HTTPBasicAuth
 
 from _internal.version import __version__
 
-import sys
 
-# def is_smartfill_running():
-#     for proc in psutil.process_iter(['pid', 'name']):
-#         try:
-#             # Check if process name matches 'SmartFill.exe'
-#             if proc.info['name'] == 'SmartFill.exe':
-#                 # If already running, show a message box with only an OK button
-#                 QMessageBox.information(None, "Already Running",
-#                                          "SmartFill läuft bereits im Hintergrund.",
-#                                          QMessageBox.StandardButton.Ok)
-#                 logging.info("SmartFill is already running. Exiting the application.")
-#                 sys.exit(0)  # Exit the program
-#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-#             pass
-#     return False
-
-
-# New config file path (FastFill version 2.0.0) in AppData
+# New config file path in AppData
 appData_path = Path(os.getenv("APPDATA")) / "FastFill"
-config_file = appData_path / "FastFillConfig200.ini"
+config_file = appData_path / "FastFillConfig.ini"
+settings_file = appData_path / "settings.ini"
 log_file = appData_path / "FastFill_app.log"
 
 # Old config file path (FastFill version 1.x) in Documents
 documents_path = Path.home() / "Documents"
 old_config_file = documents_path / "FastFillConfig.ini"
+
+current_section = None
 
 # Ensure the directory exists
 if not appData_path.exists():
@@ -55,15 +46,12 @@ if not log_file.exists():
     # You could open the file to create it or add initial logging if needed
     log_file.touch()  # This will create an empty log file
 
-current_section = None
-
 # Set up logging
 logging.basicConfig(
     filename=log_file,  # Log file location
     level=logging.DEBUG,
     format='%(asctime)s - %(funcName)s - Line: %(lineno)d ---- %(levelname)s - %(message)s'
 )
-
 
 # write log file
 try:
@@ -84,118 +72,19 @@ if old_config_file.exists():
 else:
     logging.info(f"Old config file not found: {old_config_file}")
 
-
 if not config_file.exists():
     logging.info(f"Config file does not exist, creating: {config_file}")
-    # Optionally create the new config file with initial settings
     config_file.touch()  # This will create an empty config file
 
-logging.info("Starting FastFill application.")
-
-
-def displayNotification(title, message, timeout):
-    """
-    Displays a desktop notification with the specified title, message, and timeout.
-
-    Parameters:
-    title (str): Notification title.
-    message (str): Notification message.
-    timeout (int): Duration the notification is visible.
-    """
-
-    try:
-        notification.notify(
-            title=title,
-            message=message,
-            app_name="FastFill",
-            app_icon="_internal/Icon.ico",
-            timeout=timeout
-        )
-    except Exception as e:
-        logging.error(e)
-
-
-def check_for_update():
-    """
-    Checks for updates by fetching the latest version info from GitHub version.json.
-    Notifies the user if a new version is available.
-    """
-
-    logging.info("Checking for updates...")
-    headers = {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-    }
-
-    try:
-        response = requests.get("https://raw.githubusercontent.com/PaulK6803/FastFill/main/version.json")
-        response.raise_for_status()  # Ensure we catch HTTP errors
-        data = response.json()
-
-        latest_version = data.get("version")
-        new_features = data.get("new_features_de")
-
-        if latest_version > __version__:
-            logging.info(f"Current installed version: {__version__}")
-            logging.info(f"New version available: {latest_version}")
-            if Dialog.isVisible():
-                updateWindow = QMessageBox(None)
-                updateWindow.setWindowTitle("FastFill Update verfügbar")
-                updateWindow.setTextFormat(Qt.RichText)
-                updateWindow.setText(
-                    f"<font size='4'><b>Version {latest_version} ist verfügbar.</b> <br>Möchtest du auf die Downloadseite (https://github.com) weitergeleitet werden?<br><br><br>"
-                    f"<b>Was ist neu?</b> <br>"
-                    f"{new_features}")
-                updateWindow.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-                # reply = QMessageBox.question(None, "Update verfügbar",
-                #                              f"Version {latest_version} ist verfügbar. \nMöchtest du auf die Downloadseite weitergeleitet werden? \n\n\n"
-                #                              f"<b>Was ist neu?</b> \n"
-                #                              f"<b>{new_features}</b>",
-                #                              QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
-                reply = updateWindow.exec_()
-
-
-                if reply == QMessageBox.StandardButton.Yes:
-                    logging.info("Opening new webbrowser tab...")
-                    webbrowser.open_new_tab("https://github.com/PaulK6803/FastFill/releases")
-                    logging.info("Webbrowser tab opened")
-                else:
-                    pass
-            else:
-                pass
-                # displayNotification("FastFill Update", f"Version {latest_version} ist verfügbar.", 5)
-        else:
-            logging.info(f"Current installed version: {__version__}")
-            logging.info(f"Github version: {latest_version}")
-            logging.info("Already up to date.")
-            return None
-    except Exception as e:
-        logging.error(f"Update check failed: {e}")
-        return None
-
+if not settings_file.exists():
+    logging.info(f"Config file does not exist, creating: {settings_file}")
+    settings_file.touch()  # This will create an empty config file
 
 config = configparser.ConfigParser()
+
 try:
     # Now read the config (whether it was just created or already existed)
     config.read(config_file)
-except Exception as e:
-    logging.error(e)
-
-# Create new sections, keys and values if config is empty
-try:
-    if not config.sections():
-        logging.info(f"Config file empty, creating sections.")
-        config['Kategorie 1'] = {'item1_title': 'Beispiel Text'}
-        config.set('Kategorie 1', 'item1_content', 'beispiel.mail@mail.de')
-        try:
-            with open(config_file, 'w') as f:
-                config.write(f)
-        except Exception as e:
-            logging.info(e)
-    else:
-        pass
 except Exception as e:
     logging.error(e)
 
@@ -205,6 +94,72 @@ try:
         config.write(f)
 except Exception as e:
     logging.info(e)
+
+logging.info("Starting FastFill application.")
+
+
+def check_for_update():
+    """
+    Checks for updates by fetching the latest version info from GitHub version.json.
+    Notifies the user if a new version is available.
+    """
+
+    settings_config = configparser.ConfigParser()
+    settings_config.read(settings_file)
+
+    logging.info("Checking for updates...")
+
+    try:
+        response = requests.get("https://raw.githubusercontent.com/PaulK6803/FastFill/main/version.json")
+        response.raise_for_status()  # Ensure we catch HTTP errors
+        data = response.json()
+
+        latest_version = data.get("version")
+
+        new_features = None
+
+        # Check if the 'user' section exists and get the language value
+        language_code = settings_config.get("User", "language",
+                                            fallback="en")  # Default to 'en' if 'language' is not set
+        # Determine the active language and get new features based on the language
+        if language_code == "de":  # If the language is German
+            new_features = data.get("new_features_de")
+        elif language_code == "en":  # If the language is English
+            new_features = data.get("new_features_en")
+
+        if latest_version > __version__:
+            logging.info(f"Current installed version: {__version__}")
+            logging.info(f"New version available: {latest_version}")
+            if Dialog.isVisible():
+                updateWindow = QMessageBox(None)
+                updateWindow.setWindowTitle(QCoreApplication.translate("UpdateWindow", "FastFill Update available"))
+                updateWindow.setTextFormat(Qt.RichText)
+                updateWindow.setText(QCoreApplication.translate("UpdateWindow",
+                                                                f"<font size='4'><b>Version") + f" {latest_version} " + QCoreApplication.translate(
+                    "UpdateWindow",
+                    "is available.</b> <br>Would you like to be redirected to the download page (https://github.com)?<br><br><br>"f"<b>What's new?</b> <br>") + f"{new_features}")
+
+                updateWindow.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+                reply = updateWindow.exec_()
+
+                if reply == QMessageBox.StandardButton.Yes:
+                    logging.info("Opening new webbrowser tab...")
+                    webbrowser.open_new_tab("https://github.com/PaulK6803/FastFill/releases")
+                    logging.info("Webbrowser tab opened")
+                else:
+                    pass
+            else:
+                pass
+                # displayNotification("FastFill Update", f"Version {latest_version} is available.", 5)
+        else:
+            logging.info(f"Current installed version: {__version__}")
+            logging.info(f"Github version: {latest_version}")
+            logging.info("Already up to date.")
+            return None
+    except Exception as e:
+        logging.error(f"Update check failed: {e}")
+        return None
 
 
 def isSectionEmpty(config, section):
@@ -221,7 +176,60 @@ class UiDialogMain(object):
 
     def setupUi(self, Dialog):
 
+        config = configparser.ConfigParser()
+        config.read(config_file)
+
+        self.current_toast = None # Store the toast object of show_toast_notification function
+        self.clear_clipboard_timer = None  # Store the QTimer object of button_copy_clicked function
+
         logging.info("setting up UI...")
+
+        # Use QSettings with INI format
+        self.settings = QSettings(str(settings_file), QSettings.IniFormat)
+
+        # Check if it's the first run
+        if self.settings.value("App/first_run", True, type=bool):  # Check if 'first_run' is True
+            logging.info("Starting first time configuration")  # Log first-time run
+            self.show_language_selection()  # Prompt user to select language
+            self.settings.setValue("App/first_run", False)  # Mark first run as complete
+            self.settings.sync()
+
+        # Initialize the translator
+        self.translator = QTranslator()  # Create translator object
+
+        # Get saved language from QSettings
+        lang_code = self.settings.value("User/language", "en")
+
+        # Load translation based on saved language
+        if lang_code == "de":  # If language is German
+            self.translator.load("_internal/fastfill_de.qm")  # Load German translation
+            logging.info("fastFill_de.qm language file loaded successfully")
+
+            try:
+                if not config.sections():  # If config is empty, initialize German sections
+                    config.add_section("Kategorie 1")
+                    config.set('Kategorie 1', 'item1_title', 'Beispiel Text')
+                    config.set('Kategorie 1', 'item1_content', 'beispiel.mail@mail.de')
+
+                    with open(config_file, 'w') as cfg:
+                        config.write(cfg)
+            except Exception as e:
+                logging.error(f"Error with config: {e}")
+
+        else:  # If language is English
+            try:
+                if not config.sections():  # If config is empty, initialize English sections
+                    config.add_section("Category 1")
+                    config.set('Category 1', 'item1_title', 'Example Text')
+                    config.set('Category 1', 'item1_content', 'example.mail@mail.com')
+
+                    with open(config_file, 'w') as cfg:
+                        config.write(cfg)
+            except Exception as e:
+                logging.error(f"Error with config: {e}")
+
+        # Install the translator to apply language
+        app.installTranslator(self.translator)
 
         try:
             Dialog.closeEvent = self.closeEvent
@@ -323,8 +331,8 @@ class UiDialogMain(object):
             font.setBold(True)
             self.listWidgetCategories.setFont(font)
             self.listWidgetCategories.setStyleSheet("color: white; background-color: #4c4c4c;\n"
-                                          "border: 0px solid;\n"
-                                          "border-radius: 0px;\n")
+                                                    "border: 0px solid;\n"
+                                                    "border-radius: 0px;\n")
             self.listWidgetCategories.setFrameShadow(QtWidgets.QFrame.Raised)
             self.listWidgetCategories.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
             self.listWidgetCategories.setTabKeyNavigation(True)
@@ -413,15 +421,15 @@ class UiDialogMain(object):
             self.pushButtonEditConfirm.setFont(font)
             self.pushButtonEditConfirm.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
             self.pushButtonEditConfirm.setStyleSheet("QPushButton {\n"
-                                              "    color: white;\n"
-                                              "    background-color: #31b0ff;\n"
-                                              "    border: 0px solid;\n"
-                                              "    border-radius: 8px;\n"
-                                              "}\n"
-                                              "\n"
-                                              "QPushButton:hover {\n"
-                                              "    background-color: #05a3ff;\n"
-                                              "}")
+                                                     "    color: white;\n"
+                                                     "    background-color: #31b0ff;\n"
+                                                     "    border: 0px solid;\n"
+                                                     "    border-radius: 8px;\n"
+                                                     "}\n"
+                                                     "\n"
+                                                     "QPushButton:hover {\n"
+                                                     "    background-color: #05a3ff;\n"
+                                                     "}")
             self.pushButtonEditConfirm.setCheckable(False)
             self.pushButtonEditConfirm.setObjectName("pushButtonEditConfirm")
             self.pushButtonSettings = QtWidgets.QPushButton(self.frame_5)
@@ -569,7 +577,6 @@ class UiDialogMain(object):
             self.plainTextEdit.setBackgroundVisible(False)
             self.plainTextEdit.setCenterOnScroll(False)
             self.plainTextEdit.setObjectName("plainTextEdit")
-            self.plainTextEdit.setPlaceholderText("Klicke auf einen Wert, um weitere Infos anzeigen zu lassen")
             self.plainTextEdit.clear()
             self.frame = QtWidgets.QFrame(Dialog)
             self.frame.setGeometry(QtCore.QRect(650, 80, 350, 520))
@@ -599,8 +606,6 @@ class UiDialogMain(object):
             self.labelNoValuesHint.hide()
             self.plainTextEdit.raise_()
 
-            self.retranslateUi(Dialog)
-
             self.pushButtonEdit.setVisible(False)
             self.pushButtonEditConfirm.setVisible(False)
             self.pushButtonCopyValue.setVisible(False)
@@ -609,8 +614,11 @@ class UiDialogMain(object):
 
             self.populate_sidebar()
 
-            self.pushButtonSettings.clicked.connect(self.show_settings_info_box)
+            self.pushButtonSettings.clicked.connect(lambda: self.show_settings_ContextMenu(
+                self.pushButtonSettings.mapToGlobal(QPoint(0, self.pushButtonSettings.height()))))
+
             self.pushButtonCopyValue.clicked.connect(self.button_copy_clicked)  # type: ignore
+
             self.pushButtonAddCategory.clicked.connect(self.add_category)
             self.pushButtonRemoveCategory.clicked.connect(self.remove_category)
             self.pushButtonRenameCategory.clicked.connect(self.rename_category)
@@ -629,11 +637,13 @@ class UiDialogMain(object):
 
             QtCore.QMetaObject.connectSlotsByName(Dialog)
 
+            self.retranslateUi(Dialog)
+
             # Create the Tray Icon
             self.create_tray_icon(Dialog)
         except Exception as e:
             logging.error(e)
-            QMessageBox.warning(None, "FastFill Error",
+            QMessageBox.warning(Dialog, "FastFill Error",
                                 "Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten.")
 
         logging.info("UI initialized")
@@ -642,27 +652,81 @@ class UiDialogMain(object):
         try:
             _translate = QtCore.QCoreApplication.translate
             Dialog.setWindowTitle(_translate("Dialog", "FastFill"))
+            self.plainTextEdit.setPlaceholderText(
+                _translate("Dialog", "Click on a value to display more information"))
             self.labelHeadline.setText(_translate("Dialog", "FastFill"))
-            self.labelNoValuesHint.setText(_translate("Dialog", "Es wurden noch keine Elemente hinzugefügt"))
-            self.pushButtonCopyValue.setText(_translate("Dialog", "Text kopieren"))
-            self.pushButtonSettings.setText(_translate("Dialog", "Einstellungen"))
-            self.pushButtonHelp.setText(_translate("Dialog", "Hilfe"))
-            self.pushButtonEdit.setText(_translate("Dialog", "Anpassen"))
-            self.pushButtonEditConfirm.setText(_translate("Dialog", "Bestätigen"))
+            self.labelNoValuesHint.setText(_translate("Dialog", "No elements have been added yet"))
+            self.pushButtonCopyValue.setText(_translate("Dialog", "Copy text"))
+            self.pushButtonSettings.setText(_translate("Dialog", "Settings"))
+            self.pushButtonHelp.setText(_translate("Dialog", "Help"))
+            self.pushButtonEdit.setText(_translate("Dialog", "Edit"))
+            self.pushButtonEditConfirm.setText(_translate("Dialog", "Confirm"))
             self.pushButtonAddCategory.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Kategorie hinzufügen</p></body></html>"))
+                _translate("Dialog", "Add category"))
             self.pushButtonRemoveCategory.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Kategorie entfernen</p></body></html>"))
+                _translate("Dialog", "Remove category"))
             self.pushButtonAddTitle.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Wert / Titel hinzufügen</p></body></html>"))
+                _translate("Dialog", "Add value/title"))
             self.pushButtonRemoveTitle.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Wert / Titel entfernen</p></body></html>"))
+                _translate("Dialog", "Remove value/title"))
             self.pushButtonRenameCategory.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Kategorie umbenennen</p></body></html>"))
+                _translate("Dialog", "Rename category"))
             self.pushButtonRenameTitle.setToolTip(
-                _translate("Dialog", "<html><head/><body><p>Wert / Titel umbenennen</p></body></html>"))
+                _translate("Dialog", "Rename value/title"))
+
         except Exception as e:
             logging.error(e)
+
+
+    def show_language_selection(self):
+        """ Show a message box asking the user to select a language. """
+        try:
+            msg = QMessageBox(None)
+            msg.setWindowTitle("Welcome to FastFill!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setTextFormat(Qt.RichText)  # Enables rich text
+            msg.setText(
+                "<b>Seems like you are running FastFill for the first time.</b><br> Please select your preferred language:")
+
+            # Add buttons for language selection
+            german_button = msg.addButton("German", QMessageBox.AcceptRole)
+            english_button = msg.addButton("English", QMessageBox.AcceptRole)
+
+            # Show the message box
+            msg.exec_()
+
+            # Determine which button was clicked and save the language
+            if msg.clickedButton() == german_button:
+                self.settings.setValue("User/language", "de")
+                self.settings.sync()
+            elif msg.clickedButton() == english_button:
+                self.settings.setValue("User/language", "en")
+                self.settings.sync()
+
+
+        except Exception as e:
+            logging.error(e)
+
+    def setLanguage(self, lang_code):
+        """Switch between different languages using QSettings."""
+        try:
+            # Store the selected language in QSettings
+            self.settings.setValue("User/language", lang_code)
+            self.settings.sync()
+
+            # Load the appropriate translation file
+            if lang_code == "de":
+                self.translator.load("./_internal/fastfill_de.qm")
+            # Add more languages as needed
+
+            # Install the translator so that the app uses the selected language
+            app.installTranslator(self.translator)
+
+            # Restart the app to apply changes
+            self.restart_app()
+
+        except Exception as e:
+            logging.error(f"Error setting language: {e}")
 
     def about(self):
         """Handle 'About' action."""
@@ -677,12 +741,17 @@ class UiDialogMain(object):
             <p> Icons by Icons8 - Icons used in this application are provided by <a href="https://icons8.com" target="_blank">Icons8</a>.</p>
             <br>
             <br>
-            <h3>Version 1.4.0 coded by Paul Koch</h3>
+            <h3>Privacy Policy and Disclaimer</h3>
+            <p><a href="https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md" target="_blank">https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md</a></p>
+            <br>
+            <br>
+            <h3>Version 1.4.1 coded by Paul Koch</h3>
             <p>If you have any questions or feedback, feel free to contact me:</p>
             <ul>
-                <li><a href="https://github.com/PaulK6803" target="_blank">GitHub Profile: PaulK6803</a></li>
-                <li>Email: <a href="mailto:paul.koch_nds@t-online.de">paul.koch_nds@t-online.de</a></li>
+            <li><a href="https://github.com/PaulK6803" target="_blank">GitHub Profile: PaulK6803</a></li>
+            <li><a href="https://github.com/PaulK6803/FastFill/discussions" target="_blank">GitHub Discussions: FastFill</a></li>
             </ul>
+
             """
 
         # Create a QMessageBox with rich text
@@ -723,7 +792,8 @@ class UiDialogMain(object):
                 section_items.append(section_item)
 
                 # Connect item click signal to handle category selection
-                self.listWidgetCategories.itemClicked.connect(lambda item=section_item: self.on_section_item_click(item))
+                self.listWidgetCategories.itemClicked.connect(
+                    lambda item=section_item: self.on_section_item_click(item))
 
             # Set initial section (if needed)
             if config.sections():
@@ -739,9 +809,6 @@ class UiDialogMain(object):
 
         except Exception as e:
             logging.error(e)
-
-    def show_settings_info_box(self):
-        QMessageBox.information(None, "Information", "Diese Funktion wird in einer späteren Version hinzugefügt.")
 
     def create_tray_icon(self, Dialog):
         """
@@ -761,18 +828,19 @@ class UiDialogMain(object):
 
             tray_menu.addSeparator()
 
-            open_action = QAction("FastFill öffnen", Dialog)
+            open_action = QAction(QCoreApplication.translate("TrayIcon", "Open FastFill"), Dialog)
             open_action.triggered.connect(self.show_dialog)
             tray_menu.addAction(open_action)
 
-            exit_action = QAction("FastFill beenden", Dialog)
+            exit_action = QAction(QCoreApplication.translate("TrayIcon", "Exit FastFill"), Dialog)
             exit_action.triggered.connect(self.exit_application)
             tray_menu.addAction(exit_action)
 
             tray_menu.addSeparator()
 
             # Restart Action
-            restart_action = QAction("FastFill neu starten", Dialog)
+            restart_action = QAction(QCoreApplication.translate("TrayIcon", "Restart FastFill"), Dialog)
+
             restart_action.triggered.connect(self.restart_app)
             tray_menu.addAction(restart_action)
 
@@ -800,7 +868,8 @@ class UiDialogMain(object):
         self.labelShowcaseTitle.clear()
         self.pushButtonEdit.setVisible(False)
         self.pushButtonCopyValue.setVisible(False)
-        self.plainTextEdit.setPlaceholderText("Klicke auf einen Wert, um weitere Infos anzeigen zu lassen")
+        self.plainTextEdit.setPlaceholderText(QCoreApplication.translate("on_section_item_click",
+                                                                         "Click on a value to display more information"))
 
         try:
             config = configparser.ConfigParser()
@@ -812,7 +881,9 @@ class UiDialogMain(object):
 
             if isSectionEmpty(config, current_section):
                 self.listWidget.clear()
-                self.labelNoValuesHint.setText(f"Es wurden noch keine Werte zu {current_section} hinzugefügt")
+                self.labelNoValuesHint.setText(QCoreApplication.translate("on_section_item_click",
+                                                                          f"No values have been added to the selected category yet"))
+
                 self.labelNoValuesHint.show()
             else:
                 self.labelNoValuesHint.hide()
@@ -838,8 +909,18 @@ class UiDialogMain(object):
             # Copy the content from QPlainTextEdit
             clipboard.setText(self.plainTextEdit.toPlainText())
 
-            # Clear the clipboard after 10 seconds (if needed)
-            QTimer.singleShot(10000, lambda: clipboard.clear())
+            # Cancel the previous timer if it exists
+            if self.clear_clipboard_timer:
+                self.clear_clipboard_timer.stop()
+
+            # Create a new QTimer that will clear the clipboard after 10 seconds
+            self.clear_clipboard_timer = QTimer()
+            self.clear_clipboard_timer.setSingleShot(True)
+            self.clear_clipboard_timer.timeout.connect(lambda: clipboard.clear())
+            self.clear_clipboard_timer.start(10000)  # 10 seconds
+
+            if self.settings.value("User/show_copy_notification", True, type=bool):
+                self.show_toast_notification(title="FastFill", text=QApplication.translate("ToastNotification", "The text has been copied to the clipboard"), duration=10000)
         except Exception as e:
             logging.error(e)
 
@@ -856,7 +937,8 @@ class UiDialogMain(object):
 
             if isSectionEmpty(config, section):
                 self.labelNoValuesHint.show()
-                self.labelNoValuesHint.setText(f"Es wurden noch keine Werte zu {section} hinzugefügt")
+                self.labelNoValuesHint.setText(
+                    QCoreApplication.translate("populate_list", f"No values have been added to") + f" {section}")
             else:
                 if section in config:
                     for key in config[section]:
@@ -895,7 +977,8 @@ class UiDialogMain(object):
                     self.labelShowcaseTitle.setText(title)
 
                     if not content.strip():  # Check if content is empty or ""
-                        self.plainTextEdit.setPlaceholderText(f"Klicke auf 'Anpassen', um den Inhalt von {title} zu bearbeiten")
+                        self.plainTextEdit.setPlaceholderText(
+                            QCoreApplication.translate("update_fields", f"Click on 'Edit' to modify the content"))
                         return
                     else:
                         self.plainTextEdit.setPlainText(content)
@@ -967,7 +1050,6 @@ class UiDialogMain(object):
         except Exception as e:
             logging.error(e)
 
-
     def show_listWidget_contextMenu(self, pos):
         try:
             # Get the item under the cursor
@@ -1001,9 +1083,12 @@ class UiDialogMain(object):
 
             # If an item is right-clicked
             if item is not None:
-                action1 = QAction("Umbenennen", Dialog)  # Item-specific action
-                action2 = QAction("Entfernen", Dialog)  # Item-specific action
-                action3 = QAction("Hinzufügen", Dialog)
+                action1 = QAction(QCoreApplication.translate("listWidget_ContextMenu", "Rename"),
+                                  Dialog)  # Item-specific action
+                action2 = QAction(QCoreApplication.translate("listWidget_ContextMenu", "Remove"),
+                                  Dialog)  # Item-specific action
+                action3 = QAction(QCoreApplication.translate("listWidget_ContextMenu", "Add"),
+                                  Dialog)  # Item-specific action
                 action1.triggered.connect(self.rename_title)
                 action2.triggered.connect(lambda: self.remove_title(item.text))
                 action3.triggered.connect(self.add_title)
@@ -1014,7 +1099,8 @@ class UiDialogMain(object):
 
             # If the list itself (no item) is right-clicked
             else:
-                action3 = QAction("Hinzufügen", Dialog)  # Action for the list widget
+                action3 = QAction(QCoreApplication.translate("listWidget_ContextMenu", "Add"),
+                                  Dialog)  # Action for the list widget
                 action3.triggered.connect(self.add_title)
                 contextMenu.addAction(action3)
 
@@ -1031,8 +1117,8 @@ class UiDialogMain(object):
             context_menu = QMenu(None)
 
             # Create actions for the context menu
-            report_bug_action = QAction("Report Bug", None)
-            about_action = QAction("About", None)
+            report_bug_action = QAction(QCoreApplication.translate("help_ContextMenu", "Report Bug"), None)
+            about_action = QAction(QCoreApplication.translate("help_ContextMenu", "About"), None)
 
             # Open the GitHub bug reporting page in the default browser
             github_url = "https://github.com/PaulK6803/FastFill/issues"  # Replace with your bug reporting page URL
@@ -1050,10 +1136,104 @@ class UiDialogMain(object):
         except Exception as e:
             logging.error(e)
 
+    def show_settings_ContextMenu(self, pos):
+        """Display the settings context menu."""
+        try:
+
+            menu = QMenu(None)
+
+            # Language submenu
+            language_menu = QMenu(QCoreApplication.translate("settings_ContextMenu", "Language"), None)
+
+            # Add language options
+
+            action_de = QAction(QCoreApplication.translate("settings_ContextMenu", "German"), None)
+            action_de.setCheckable(True)
+            action_de.triggered.connect(lambda: self.setLanguage("de"))
+            action_en = QAction(QCoreApplication.translate("settings_ContextMenu", "English"), None)
+            action_en.setCheckable(True)
+            action_en.triggered.connect(lambda: self.setLanguage("en"))
+
+            if self.settings.value("User/language", "en") == "de":
+                action_de.setChecked(True)
+            else:
+                action_en.setChecked(True)
+
+            language_menu.addAction(action_de)
+            language_menu.addAction(action_en)
+
+            # Other settings options
+            start_with_windows_action = QAction(
+                QCoreApplication.translate("settings_ContextMenu", "Start FastFill with Windows"), None)
+            start_with_windows_action.setCheckable(True)
+
+            # Load saved setting
+            start_with_windows_action.setChecked(self.settings.value("App/start_with_windows", False, type=bool))
+
+            # Connect toggle signal
+            start_with_windows_action.triggered.connect(lambda checked: self.start_with_windows(checked, self.settings))
+
+            start_minimized_action = QAction(
+                QCoreApplication.translate("settings_ContextMenu", "Start FastFill Minimized"), None)
+            start_minimized_action.setCheckable(True)
+            start_minimized_action.setChecked(self.settings.value("App/start_minimized", False, type=bool))
+
+            # Connect toggle signal
+            start_minimized_action.triggered.connect(lambda checked: self.toggle_start_minimized(checked, self.settings))
+
+            show_copy_notification_action = QAction(
+                QCoreApplication.translate("settings_ContextMenu", "Show text copied Notification"), None)
+            show_copy_notification_action.setCheckable(True)
+            show_copy_notification_action.setChecked(self.settings.value("User/show_copy_notification", True, type=bool))
+
+            if self.settings.value("User/show_copy_notification", True, type=bool):
+                show_copy_notification_action.triggered.connect(lambda checked: self.settings.setValue("User/show_copy_notification", False))
+            else:
+                show_copy_notification_action.triggered.connect(lambda checked: self.settings.setValue("User/show_copy_notification", True))
+
+
+            # Add actions to menu
+            menu.addMenu(language_menu)
+            menu.addAction(start_with_windows_action)
+            menu.addAction(start_minimized_action)
+            menu.addAction(show_copy_notification_action)
+
+            # Show menu at the button's position
+            menu.exec_(pos)
+        except Exception as e:
+            logging.error(e)
+
+    def start_with_windows(self, enable, settings):
+        """Enable or disable starting FastFill with Windows."""
+        try:
+            exe_path = os.path.abspath(sys.argv[0])  # Get the path of the running FastFill.exe
+            registry_key = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_key, 0, winreg.KEY_ALL_ACCESS) as key:
+                if enable:
+                    winreg.SetValueEx(key, "FastFill", 0, winreg.REG_SZ, exe_path)
+                else:
+                    try:
+                        winreg.DeleteValue(key, "FastFill")
+                    except FileNotFoundError:
+                        pass  # If it doesn't exist, ignore it
+
+            # Save setting
+            settings.setValue("App/start_with_windows", enable)
+            settings.sync()
+
+        except Exception as e:
+            logging.error(f"Failed to modify startup setting: {e}")
+
+    def toggle_start_minimized(self, checked, settings):
+        """Enable or disable starting FastFill minimized."""
+        settings.setValue("App/start_minimized", checked)
+        settings.sync()
+
     def rename_category(self):
 
         """
-        Renames the selected category (section) from the frame and updates the INI configuration.
+        Renames the selected category (section) and updates the INI configuration.
         """
 
         global current_section
@@ -1063,18 +1243,23 @@ class UiDialogMain(object):
             config.read(config_file)
 
             if current_section not in config.sections():
-                QMessageBox.warning(None, "Error",
-                                    "Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten")
+                QMessageBox.warning(Dialog, "Error",
+                                    QCoreApplication.translate("rename_category",
+                                                               "An error occurred. Please try restarting the application"))
                 return
 
             # Show input dialog to ask for a new category name
-            new_category_name, ok = QInputDialog.getText(None, "Kategorie umbenennen", "Neuer Name für die Kategorie:",
+            new_category_name, ok = QInputDialog.getText(Dialog, "FastFill",
+                                                         QCoreApplication.translate("rename_category",
+                                                                                    "New name for the category:"),
                                                          text=current_section)
 
             if ok and new_category_name:  # If user confirmed and entered a name
                 # Check if the new name already exists
                 if new_category_name in config.sections():
-                    QMessageBox.warning(None, "Category Exists", "Kategorie mit diesem Namen existiert bereits.")
+                    QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_category",
+                                                                                    "A category with this name already exists."))
+
                     return
 
                 # Rename the category in the config
@@ -1109,7 +1294,8 @@ class UiDialogMain(object):
 
             if not selected_item:
                 # Zeige eine Warnung an, wenn keine Kategorie ausgewählt wurde
-                QMessageBox.warning(None, "Input Error", "Bitte wähle eine Kategorie zum Entfernen aus.")
+                QMessageBox.warning(Dialog, "Input Error", QCoreApplication.translate("remove_category",
+                                                                                      "Please select a category to remove."))
                 return
 
             # Den Text der ausgewählten Kategorie extrahieren
@@ -1121,22 +1307,24 @@ class UiDialogMain(object):
 
             # Prevent removing the last category
             if len(config.sections()) == 1:
-                QMessageBox.warning(None, "Error", "Die Kategorie kann nicht entfernt werden. Es muss mindestens eine Kategorie vorhanden sein.")
+                QMessageBox.warning(Dialog, "Error",
+                                    QCoreApplication.translate("remove_category",
+                                                               "The category cannot be removed. There must be at least one category present."))
                 return
 
             # Überprüfen, ob die Kategorie existiert
             if category_to_remove not in config.sections():
-                QMessageBox.warning(None, "Error", f"Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten")
+                QMessageBox.warning(Dialog, "Error",
+                                    QCoreApplication.translate("remove_category",
+                                                               f"An error occurred. Please try restarting the application."))
                 return
 
             # Show a confirmation dialog
             reply = QtWidgets.QMessageBox.question(
-                None,
-                "Kategorie löschen?",
-                f"Möchtest du die Kategorie '{category_to_remove}' wirklich entfernen?",
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                QtWidgets.QMessageBox.No
-            )
+                Dialog, "Delete category?", QCoreApplication.translate("remove_category",
+                                                                       f"Are you sure you want to remove the category") + f" \n\n{category_to_remove}",
+                                            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                QtWidgets.QMessageBox.No)
 
             # If the user chooses 'No', exit the function
             if reply == QtWidgets.QMessageBox.No:
@@ -1161,7 +1349,8 @@ class UiDialogMain(object):
             config.read(config_file)
 
             # Open a QInputDialog to get the new category name
-            new_category, ok = QInputDialog.getText(None, "Neue Kategorie", "Name der neuen Kategorie:")
+            new_category, ok = QInputDialog.getText(Dialog, "New category", QCoreApplication.translate("add_category",
+                                                                                                       "Name of the new category:"))
 
             # If user clicked OK and entered a valid name
             if ok and new_category:
@@ -1169,7 +1358,8 @@ class UiDialogMain(object):
 
                 # Check if category already exists
                 if new_category in config.sections():
-                    QMessageBox.warning(None, "Category Exists", "Eine Kategorie mit diesem Namen existiert bereits.")
+                    QMessageBox.warning(Dialog, "Category Exists", QCoreApplication.translate("add_category",
+                                                                                              "A category with this name already exists."))
                     return
 
                 # Add the new section to the config
@@ -1185,20 +1375,23 @@ class UiDialogMain(object):
 
     def rename_title(self):
         """
-            Renames the selected item in listWidget and updates the INI configuration.
-            """
+        Renames the selected item in listWidget and updates the INI configuration.
+        """
         global current_section
 
         # Get the selected item from the list
         selected_item = self.listWidget.currentItem()
         if not selected_item:
-            QtWidgets.QMessageBox.warning(None, "Fehler", "Bitte wähle zuerst einen Wert aus der Liste.")
+            QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
+                                                                                      "Please select a value from the list first."))
             return
 
         old_title = selected_item.text()  # Get the current title
 
         # Ask the user for a new name
-        new_title, ok = QtWidgets.QInputDialog.getText(None, "Umbenennen", "Neuer Name für den Wert:", text=old_title)
+        new_title, ok = QtWidgets.QInputDialog.getText(Dialog, "Rename", QCoreApplication.translate("rename_title",
+                                                                                                    "New name for the value:"),
+                                                       text=old_title)
 
         if not ok or not new_title.strip():  # If cancelled or empty input
             return
@@ -1210,7 +1403,8 @@ class UiDialogMain(object):
             config.read(config_file)
 
             if current_section not in config.sections():
-                QtWidgets.QMessageBox.warning(None, "Fehler", "Die aktuelle Kategorie wurde nicht gefunden.")
+                QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
+                                                                                          "The current category was not found."))
                 return
 
             # Find the key for the selected title
@@ -1221,13 +1415,15 @@ class UiDialogMain(object):
                     break
 
             if not key_to_rename:
-                QtWidgets.QMessageBox.warning(None, "Fehler", "Fehler beim Umbenennen des Wertes.")
+                QtWidgets.QMessageBox.warning(Dialog, "Error",
+                                              QCoreApplication.translate("rename_title", "Error renaming the value."))
                 return
 
             # Check if the new title already exists
             existing_titles = [config[current_section][k] for k in config[current_section] if k.endswith("_title")]
             if new_title in existing_titles:
-                QtWidgets.QMessageBox.warning(None, "Fehler", "Ein Wert mit diesem Namen existiert bereits.")
+                QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
+                                                                                          "A value with this name already exists."))
                 return
 
             # Rename the title in the config
@@ -1242,7 +1438,9 @@ class UiDialogMain(object):
 
         except Exception as e:
             logging.error(f"Error in action1 (rename title): {e}")
-            QtWidgets.QMessageBox.warning(None, "Fehler", "Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten")
+            QtWidgets.QMessageBox.warning(Dialog, "Error",
+                                          QCoreApplication.translate("rename_title",
+                                                                     "An error occurred. Please try restarting the application."))
 
     def remove_title(self, key):
         """
@@ -1253,19 +1451,17 @@ class UiDialogMain(object):
         # Get the selected item from listWidget
         selected_item = self.listWidget.currentItem()
         if not selected_item:
-            QtWidgets.QMessageBox.warning(None, "Selection Error", "Bitte wähle zuerst einen Wert aus der Liste.")
+            QtWidgets.QMessageBox.warning(Dialog, "Selection Error", QCoreApplication.translate("remove_title",
+                                                                                                "Please select a value from the list first."))
             return
 
         item_title = selected_item.text()  # Get the title of the selected item
 
         # Confirm deletion
-        reply = QtWidgets.QMessageBox.question(
-            None,
-            "Wert entfernen",
-            f"Möchtest du '{item_title}' wirklich entfernen?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No
-        )
+        reply = QtWidgets.QMessageBox.question(Dialog, "remove value", QCoreApplication.translate("remove_title",
+                                                                                                  "Are you sure you want to remove") + f" \n\n{item_title}",
+                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                               QtWidgets.QMessageBox.No)
 
         if reply == QtWidgets.QMessageBox.No:
             return  # Cancel deletion if user selects "No"
@@ -1277,7 +1473,8 @@ class UiDialogMain(object):
 
             # Ensure the section exists in the config
             if current_section not in config.sections():
-                QtWidgets.QMessageBox.warning(None, "Error", "Kategorie nicht gefunden.")
+                QtWidgets.QMessageBox.warning(Dialog, "Error",
+                                              QCoreApplication.translate("remove_title", "Category not found."))
                 return
 
             # Find the key index for the selected title
@@ -1324,8 +1521,9 @@ class UiDialogMain(object):
                 logging.info(f"Removed Key / Title: {item_title} from {current_section}.")
 
             else:
-                QtWidgets.QMessageBox.warning(None, "Error",
-                                              "Ein Fehler ist aufgetreten. Versuche die Anwendung neu zu starten.")
+                QtWidgets.QMessageBox.warning(Dialog, "Error",
+                                              QCoreApplication.translate("remove_title",
+                                                                         "An error occurred. Try restarting the application."))
         except Exception as e:
             logging.error(e)
 
@@ -1337,12 +1535,14 @@ class UiDialogMain(object):
 
         # Ensure the selected section exists
         if current_section not in config.sections():
-            QMessageBox.warning(None, "Error",
-                                "Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten.")
+            QMessageBox.warning(Dialog, "Error",
+                                QCoreApplication.translate("add_title",
+                                                           "An error occurred. Try restarting the application."))
             return
 
         # Open a QInputDialog to get the new item's title
-        new_title, ok = QInputDialog.getText(None, "Neuer Wert", "Gebe den Namen des neuen Wertes ein:")
+        new_title, ok = QInputDialog.getText(Dialog, "New value", QCoreApplication.translate("add_title",
+                                                                                             "Enter the name of the new value:"))
 
         # If user clicked OK and entered a valid title
         if ok and new_title:
@@ -1353,8 +1553,9 @@ class UiDialogMain(object):
                                key.endswith("_title")]
 
             if new_title in existing_titles:
-                QMessageBox.warning(None, "Wert existiert bereits",
-                                    f"Dieser Wert existiert bereits in der Kategorie ({current_section}).")
+                QMessageBox.warning(Dialog, "Value already exists",
+                                    QCoreApplication.translate("add_title",
+                                                               f"This value already exists in the category") + f"\n\n{current_section}.")
                 return
 
             # Add the title to the QListWidget
@@ -1407,6 +1608,7 @@ class UiDialogMain(object):
             clipboard.clear()
             logging.info("Exiting application via Tray Icon")
             QApplication.quit()
+            sys.exit()
         except Exception as e:
             logging.error(e)
 
@@ -1417,7 +1619,6 @@ class UiDialogMain(object):
         try:
             event.ignore()  # Prevent the dialog from closing
             Dialog.hide()  # Hide the dialog
-            # displayNotification(title="FastFill", message="FastFill läuft im Hintergrund", timeout=4)
         except Exception as e:
             logging.error(e)
 
@@ -1432,21 +1633,48 @@ class UiDialogMain(object):
         except Exception as e:
             logging.error(e)
 
+    def show_toast_notification(self, title, text, duration):
+
+        # If a toast is already showing, hide it before creating a new one
+        if self.current_toast:
+            self.current_toast.hide()  # Hide the existing toast
+
+
+        self.current_toast = Toast(Dialog)
+        self.current_toast.setDuration(duration=duration)  # in ms (5000 = 5 s)
+        self.current_toast.setTitle(title=title) # title
+        self.current_toast.setText(text=text) # text
+
+        self.current_toast.setPosition(ToastPosition.BOTTOM_RIGHT) # position of toast notification on screen
+        self.current_toast.setMaximumOnScreen(1) # maximum toast notifications shown at once
+        self.current_toast.setResetDurationOnHover(False) # If duration bar resets on hover
+
+        self.current_toast.applyPreset(ToastPreset.SUCCESS)  # Apply style preset
+        self.current_toast.setBorderRadius(4)
+        self.current_toast.setBackgroundColor(QColor('#ffffff'))
+        self.current_toast.setDurationBarColor(QColor('#31b0ff'))
+
+        self.current_toast.show()
+
 
 if __name__ == '__main__':
     try:
         app = QApplication(sys.argv)
 
-        # is_smartfill_running()
+        settings = QSettings(str(settings_file), QSettings.IniFormat)
+        start_minimized = settings.value("App/start_minimized", False, type=bool)
 
         Dialog = QDialog()
         ui = UiDialogMain()
         ui.setupUi(Dialog)
-        ui.dialog = Dialog  # Speichert das Dialog-Objekt
-        Dialog.show()
+        ui.dialog = Dialog  # saves the Dialog-Object
+        if not start_minimized:
+            Dialog.show()
         logging.info("FastFill application started.")  #
         check_for_update()
         sys.exit(app.exec_())
     except Exception as e:
         logging.error(e)
+
+
 
