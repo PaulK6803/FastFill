@@ -66,7 +66,7 @@ Thank you for your support!
 If you have any questions, suggestions, or feedback about the project, feel free to contact me:
 
 - **GitHub Profile**: [PaulK6803](https://github.com/PaulK6803)
-- **Email**: [paul.koch_nds@t-online.de](mailto:paul.koch_nds@t-online.de)
+- **Github Discussions** [https://github.com/PaulK6803/FastFill/discussions](https://github.com/PaulK6803/FastFill/discussions)
 
 
 
