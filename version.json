@@ -1,5 +1,5 @@
 {
     "version": "1.4",
     "new_features_de": "- Einstellungen-Schaltfläche jetzt funktionsfähig<br><br>- Option, Sprache ändern (Englisch und Deutsch)<br>- Option, FastFill mit dem Windows-Start zu starten<br>- Option, FastFill minimiert / als Tray-Icon zu starten<br>- Option, Benachrichtigung, wenn ein Text kopiert wurde ein- oder ausblenden<br><br>- Überarbeitete 'Über'-Info-Box<br>- Benachrichtigung, wenn ein Text kopiert wurde<br>- Kleinere Bugfixes",
-    "new_features_en": "- Settings Button Now Functional<br>- Change language (English and German)<br>- Option to start FastFill with Windows bootup<br>- Option to start FastFill minimized or as a Tray Icon<br>- Option to toggle notification when text is copied<br>- Revised 'About' Info Box<br>- Notification when text is copied<br>- Minor Bug Fixes"
+    "new_features_en": "- Settings Button Now Functional<br><br>- Option to change language (English and German)<br>- Option to start FastFill with Windows bootup<br>- Option to start FastFill minimized or as a Tray Icon<br>- Option to toggle notification when text is copied<br><br>- Revised 'About' Info Box<br>- Notification when text is copied<br>- Minor Bug Fixes"
 }
