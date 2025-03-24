@@ -23,7 +23,7 @@ A copy of the GNU General Public License can be viewed at:
 
 ## **Deutsch**
 
-**FastFill – Lizenz (GPLv3 mit Einschränkung der kommerziellen Nutzung)**
+**FastFill – Lizenz (GPLv3)**
 
 Copyright (C) [2025] [Paul Koch]
 
@@ -39,10 +39,6 @@ Dieses Programm wird in der Hoffnung verbreitet, dass es nützlich ist, jedoch *
 
 Eine Kopie der GNU General Public License ist in dieser Datei enthalten oder kann unter folgendem Link eingesehen werden:  
 [https://www.gnu.org/licenses/gpl-3.0.de.html](https://www.gnu.org/licenses/gpl-3.0.de.html)
-
-### **Zusätzliche Klausel zur kommerziellen Nutzung**
-Die Nutzung, Modifikation und Weiterverbreitung dieses Programms oder seines Codes für **kommerzielle Zwecke ist untersagt**. Dies umfasst insbesondere, aber nicht ausschließlich, den Verkauf, die Integration in kommerzielle Produkte oder das Anbieten als kostenpflichtigen Service.
-
 
 ---
 ---
