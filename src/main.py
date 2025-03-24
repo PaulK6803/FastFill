@@ -737,7 +737,7 @@ class UiDialogMain(object):
             <p><strong>FastFill</strong> is a Windows application built using Python and PyQt5, designed to easily manage and copy frequently used texts - such as emails, templates, and more. It allows you to easily copy these texts to your clipboard for fast and efficient pasting, saving you time and effort.</p>
             <br>
             <h3>License</h3>
-            <p>This project is licensed under the <a href="https://github.com/PaulK6803/FastFill/tree/main?tab=License-1-ov-file" target="_blank">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a> (CC BY-NC-SA 4.0).</p>
+            <p>This project is licensed under the <a href="https://github.com/PaulK6803/FastFill/tree/main?tab=License-1-ov-file" target="_blank">GNU GENERAL PUBLIC LICENSE</a><br>Copyright © 2007 Free Software Foundation (GPLv3 with restriction on commercial use).</p>
             <p> Icons by Icons8 - Icons used in this application are provided by <a href="https://icons8.com" target="_blank">Icons8</a>.</p>
             <br>
             <br>
@@ -996,12 +996,14 @@ class UiDialogMain(object):
             self.pushButtonEdit.setVisible(False)
             self.pushButtonEditConfirm.setVisible(True)
             self.plainTextEdit.setFrameShape(QFrame.Box)
+            self.plainTextEdit.setStyleSheet("border: 2px solid red;")
 
         else:
             self.plainTextEdit.setReadOnly(True)
             self.pushButtonEditConfirm.setVisible(False)
             self.pushButtonEdit.setVisible(True)
             self.plainTextEdit.setFrameShape(QFrame.NoFrame)
+            self.plainTextEdit.setStyleSheet("")
             self.listWidget.setEnabled(True)
             self.listWidgetCategories.setEnabled(True)
 
