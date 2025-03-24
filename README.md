@@ -23,6 +23,12 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 - ⚙️ **Customizable settings** – Customizable settings designed for an intuitive and user-friendly experience
 - 🎛 **System tray integration** – Quickly open, close, or restart the app
 
+(planned)
+- **Dark Mode**
+- **Encrypted text entries**
+- **Drag and Drop to reorder categories and titles**
+- **Automatic Update**
+
 ---
 
 ## 📥 Installation
