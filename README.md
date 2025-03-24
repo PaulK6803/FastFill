@@ -40,7 +40,7 @@ The [FastFillSetup.exe](https://www.virustotal.com/gui/file/c8de5a77d9a3e39f9537
 1. **Fork the repository** and create your feature branch from `develop`.  
 2. **Make your changes** and test them thoroughly.  
 3. **Submit a pull request (PR) to `develop`** with a clear description of your changes.  
-4. **Ensure your changes comply with the [license](LICENSE.md) terms**, particularly regarding non-commercial use.
+4. **Ensure your changes comply with the [license](LICENSE.md) terms**.
 
 🔄 Once changes in `develop` are tested and stable, the repository owner will merge them into `main`.  
 
