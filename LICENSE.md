@@ -4,7 +4,13 @@
 
 **FastFill – License (GPLv3 with restriction on commercial use)**
 
-Copyright (C) [Year] [Your Name]
+Copyright (C) [2025] [Paul Koch]
+
+**GNU GENERAL PUBLIC LICENSE** Version 3, 29 June 2007
+
+Copyright © 2007 Free Software Foundation, Inc. <https://fsf.org/>
+
+Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 (GPLv3) as published by the Free Software Foundation.
 
@@ -22,7 +28,13 @@ The use, modification, and redistribution of this program or its code **for comm
 
 **FastFill – Lizenz (GPLv3 mit Einschränkung der kommerziellen Nutzung)**
 
-Copyright (C) [Jahr] [Dein Name]
+Copyright (C) [2025] [Paul Koch]
+
+**GNU GENERAL PUBLIC LICENSE** Version 3, 29 June 2007
+
+Copyright © 2007 Free Software Foundation, Inc. <https://fsf.org/>
+
+Jeder darf unveränderte Kopien dieses Lizenzdokuments kopieren und verteilen, aber Änderungen sind nicht erlaubt.
 
 Dieses Programm ist freie Software: Sie können es unter den Bedingungen der GNU General Public License Version 3 (GPLv3) weiterverbreiten und/oder modifizieren, wie sie von der Free Software Foundation veröffentlicht wurde.
 
