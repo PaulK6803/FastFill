@@ -2,7 +2,7 @@
 
 ## **English**
 
-**FastFill – License (GPLv3 with restriction on commercial use)**
+**FastFill – License (GPLv3)**
 
 Copyright (C) [2025] [Paul Koch]
 
@@ -18,9 +18,6 @@ This program is distributed in the hope that it will be useful, but **WITHOUT AN
 
 A copy of the GNU General Public License can be viewed at:  
 [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)
-
-### **Additional clause on commercial use**
-The use, modification, and redistribution of this program or its code **for commercial purposes is prohibited**. This includes, but is not limited to, selling, integrating it into commercial products, or offering it as a paid service.
 
 ---
 
