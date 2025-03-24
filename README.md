@@ -27,7 +27,7 @@ To install FastFill, simply download the installer for Windows from the Releases
 
 - [Windows Installer](https://github.com/PaulK6803/FastFill/releases)
 
-The [FastFillSetup.exe](https://www.virustotal.com/gui/file/766496e756ff74283feb0d4427209037439b21bae12c4701796fe3195f3d982a?nocache=1) and [FastFill.exe](https://www.virustotal.com/gui/file/939c192d81d5ae1038680e1707bb4466877559f2ee29593a1480a8f6c684ff5a?nocache=1) have been scanned on VirusTotal and are safe to use. If your antivirus flags them, you can safely add them to your exclusions.
+The [FastFillSetup.exe](https://www.virustotal.com/gui/file/c8de5a77d9a3e39f953752c06e66f0deec79bae146c4080bb7d91c81fb663980?nocache=1) and [FastFill.exe](https://www.virustotal.com/gui/file/25caa6c77e288ae5996352bcabe0912e5f9d6dd006cc9ff5abff9d710fd73aaa?nocache=1) have been scanned on VirusTotal and are safe to use. If your antivirus flags them, you can safely add them to your exclusions.
 
 ---
 
