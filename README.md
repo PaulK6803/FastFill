@@ -18,8 +18,8 @@ FastFill is a **Windows application** built using **Python** and **PyQt5**, desi
 
 FastFill allows you to efficiently manage frequently used texts and copy them directly to your clipboard for quick pasting.
 
-- 🗂 **Organize categories** – Create, delete, rename, and organize them  
-- 📝 **Manage text entries** – Add, remove, reorder, and rename saved texts  
+- 🗂 **Organize categories** – Create, delete, rename  
+- 📝 **Manage text entries** – Add, remove, and rename saved texts
 - ⚙️ **Customizable settings** – Customizable settings designed for an intuitive and user-friendly experience
 - 🎛 **System tray integration** – Quickly open, close, or restart the app
 
