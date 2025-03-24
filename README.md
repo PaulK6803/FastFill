@@ -51,7 +51,7 @@ We welcome contributions to the `develop` branch! If you'd like to contribute, p
 ## 📜 License
 
 By submitting a pull request, you agree that your contributions will be licensed under the same license as the project:  
-**CC BY-NC 4.0 (Creative Commons Attribution-NonCommercial 4.0).**
+**GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007.**
 
 ---
 
