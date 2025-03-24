@@ -48,7 +48,7 @@ The [FastFillSetup.exe](https://www.virustotal.com/gui/file/c8de5a77d9a3e39f9537
 
 **License**
 
-By submitting a pull request, you agree that your contributions will be licensed under the same license as the project (CC BY-NC 4.0).
+By submitting a pull request, you agree that your contributions will be licensed under the same license as the project GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007.
 
 **Code of Conduct**
 
