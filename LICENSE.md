@@ -1,31 +1,39 @@
 # License Information
 
- <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/PaulK6803/FastFill">FastFill</a> by <span property="cc:attributionName">Paul Koch</span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p> 
+## **English**
 
-# Legal Information
+**FastFill – License (GPLv3 with restriction on commercial use)**
 
-For details on privacy and terms of use, please refer to the [Privacy Policy and Disclaimer](Privacy_Policy_and_Disclaimer.md).
+Copyright (C) [Year] [Your Name]
 
-## You are free to:
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3 (GPLv3) as published by the Free Software Foundation.
 
-- **Share** — Copy and redistribute the material in any medium or format.
-- **Adapt** — Remix, transform, and build upon the material.
+This program is distributed in the hope that it will be useful, but **WITHOUT ANY WARRANTY**; without even the implied warranty of **MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE**. See the GNU General Public License for more details.
 
-The licensor cannot revoke these freedoms as long as you follow the terms of the license.
+A copy of the GNU General Public License is included in this file or can be viewed at:  
+[https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-## Under the following terms:
+### **Additional clause on commercial use**
+The use, modification, and redistribution of this program or its code **for commercial purposes is prohibited**. This includes, but is not limited to, selling, integrating it into commercial products, or offering it as a paid service.
 
-- **Attribution** — You must give appropriate credit to the original author (Paul Koch), provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but **not in any way** that suggests the licensor endorses you or your use.
+---
 
-- **NonCommercial** — You may not use the material for commercial purposes.
+## **Deutsch**
 
-- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+**FastFill – Lizenz (GPLv3 mit Einschränkung der kommerziellen Nutzung)**
 
-- **No additional restrictions** — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+Copyright (C) [Jahr] [Dein Name]
 
-## Additional project-specific terms:
+Dieses Programm ist freie Software: Sie können es unter den Bedingungen der GNU General Public License Version 3 (GPLv3) weiterverbreiten und/oder modifizieren, wie sie von der Free Software Foundation veröffentlicht wurde.
 
-- **No independent redistribution** — The source code may not be redistributed outside of the original repository without explicit permission. Modifications and improvements should be submitted as pull requests to the main project.
+Dieses Programm wird in der Hoffnung verbreitet, dass es nützlich ist, jedoch **OHNE JEDE GARANTIE**; selbst ohne die implizite Garantie der **MARKTGÄNGIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK**. Siehe die GNU General Public License für weitere Details.
+
+Eine Kopie der GNU General Public License ist in dieser Datei enthalten oder kann unter folgendem Link eingesehen werden:  
+[https://www.gnu.org/licenses/gpl-3.0.de.html](https://www.gnu.org/licenses/gpl-3.0.de.html)
+
+### **Zusätzliche Klausel zur kommerziellen Nutzung**
+Die Nutzung, Modifikation und Weiterverbreitung dieses Programms oder seines Codes für **kommerzielle Zwecke ist untersagt**. Dies umfasst insbesondere, aber nicht ausschließlich, den Verkauf, die Integration in kommerzielle Produkte oder das Anbieten als kostenpflichtigen Service.
+
 
 ---
 ---
