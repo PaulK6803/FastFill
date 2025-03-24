@@ -44,7 +44,7 @@ We welcome contributions to the `develop` branch! If you'd like to contribute, p
 1. **Fork the repository** and create your branch from `develop`.  
 2. **Make your changes** and test thoroughly.  
 3. **Submit a pull request (PR) to `develop`** with a clear description of your changes.  
-4. Ensure your changes comply with the [license](LICENSE.md) terms, particularly regarding non-commercial use.  
+4. Ensure your changes comply with the [license](LICENSE.md) terms.  
 
 ---
 
