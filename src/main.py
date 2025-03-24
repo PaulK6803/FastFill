@@ -11,7 +11,7 @@ import configparser
 import os
 import sys
 
-from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtGui import QBrush, QColor, QIcon
 from PyQt5.QtCore import QTimer, Qt, QSize, QPoint, QCoreApplication, QTranslator, QSettings
 from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -242,6 +242,7 @@ class UiDialogMain(object):
             font.setFamily("Arial")
             Dialog.setFont(font)
             Dialog.setFocusPolicy(QtCore.Qt.NoFocus)
+            Dialog.setWindowIcon(QIcon("_internal/Icon.ico"))
             Dialog.setStyleSheet("QDialog{\n"
                                  "background-color: rgb(255, 255, 255)\n"
                                  "}\n"
@@ -737,7 +738,7 @@ class UiDialogMain(object):
             <p><strong>FastFill</strong> is a Windows application built using Python and PyQt5, designed to easily manage and copy frequently used texts - such as emails, templates, and more. It allows you to easily copy these texts to your clipboard for fast and efficient pasting, saving you time and effort.</p>
             <br>
             <h3>License</h3>
-            <p>This project is licensed under the <a href="https://github.com/PaulK6803/FastFill/tree/main?tab=License-1-ov-file" target="_blank">GNU GENERAL PUBLIC LICENSE</a><br>Copyright © 2007 Free Software Foundation (GPLv3 with restriction on commercial use).</p>
+            <p>This project is licensed under the <a href="https://github.com/PaulK6803/FastFill/tree/main?tab=License-1-ov-file" target="_blank">GNU GENERAL PUBLIC LICENSE</a><br>Copyright © 2007 Free Software Foundation (GPLv3).</p>
             <p> Icons by Icons8 - Icons used in this application are provided by <a href="https://icons8.com" target="_blank">Icons8</a>.</p>
             <br>
             <br>
