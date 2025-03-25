@@ -11,7 +11,7 @@ We welcome contributions to FastFill! Here's how you can help:
 
 ## License
 
-By submitting a pull request, you agree that your contributions will be licensed under the same license as the project (CC BY-NC 4.0).
+By submitting a pull request, you agree that your contributions will be licensed under the same license as the project GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007.
 
 ## Code of Conduct
 
