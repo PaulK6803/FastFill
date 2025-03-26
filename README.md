@@ -14,7 +14,7 @@ FastFill is a **Windows application** built using **Python** and **PyQt5**, desi
 
 ---
 
-## ✨ Features (in development)
+## ✨ Features
 
 FastFill allows you to efficiently manage frequently used texts and copy them directly to your clipboard for quick pasting.
 
