@@ -29,9 +29,7 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 
 (planned)
 - **Dark Mode**
-- **Encrypted text entries**
-- **Drag and Drop to reorder categories and titles**
-- **Automatic Update**
+- **bug fixes**
 
 ---
 
