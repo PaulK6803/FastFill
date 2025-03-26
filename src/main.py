@@ -2,6 +2,7 @@
 # designed to easily manage and copy frequently used texts - such as emails, templates, and more.
 # It allows you to easily copy these texts to your clipboard for fast and efficient pasting, saving you time and effort.
 import subprocess
+import tempfile
 import webbrowser
 import winreg
 
@@ -11,9 +12,16 @@ import configparser
 import os
 import sys
 
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+import base64
+
 from PyQt5.QtGui import QBrush, QColor, QIcon
 from PyQt5.QtCore import QTimer, Qt, QSize, QPoint, QCoreApplication, QTranslator, QSettings
-from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame
+from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame, QLineEdit, \
+    QVBoxLayout, QLabel, QProgressBar, QPushButton, QProgressDialog, QAbstractItemView
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
@@ -137,16 +145,18 @@ def check_for_update():
                 updateWindow.setText(QCoreApplication.translate("UpdateWindow",
                                                                 f"<font size='4'><b>Version") + f" {latest_version} " + QCoreApplication.translate(
                     "UpdateWindow",
-                    "is available.</b> <br>Would you like to be redirected to the download page (https://github.com)?<br><br><br>"f"<b>What's new?</b> <br>") + f"{new_features}")
+                    "is available.</b> <br>Would you like to download the update now?<br><br><br>"f"<b>What's new?</b> <br>") + f"{new_features}")
 
                 updateWindow.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
                 reply = updateWindow.exec_()
 
                 if reply == QMessageBox.StandardButton.Yes:
-                    logging.info("Opening new webbrowser tab...")
-                    webbrowser.open_new_tab("https://github.com/PaulK6803/FastFill/releases")
-                    logging.info("Webbrowser tab opened")
+                    download_update()
+
+                    # logging.info("Opening new webbrowser tab...")
+                    # webbrowser.open_new_tab("https://github.com/PaulK6803/FastFill/releases")
+                    # logging.info("Webbrowser tab opened")
                 else:
                     pass
             else:
@@ -160,6 +170,57 @@ def check_for_update():
     except Exception as e:
         logging.error(f"Update check failed: {e}")
         return None
+
+
+def download_update():
+    """
+        Downloads FastFillSetup.exe and installs it.
+        """
+    url = "https://github.com/PaulK6803/FastFill/releases/latest/download/FastFillSetup.exe"
+    temp_dir = tempfile.gettempdir()
+    setup_path = os.path.join(temp_dir, "FastFillSetup.exe")
+
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        total_size = int(response.headers.get("content-length", 0))
+        block_size = 1024  # 1 KB
+        downloaded_size = 0
+
+        progress = QProgressDialog("Downloading update...", "Cancel", 0, total_size)
+        progress.setWindowIcon(QIcon("_internal/Icon.ico"))
+        progress.setWindowTitle("FastFill Update")
+
+        progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        progress.setMinimumDuration(0)
+        progress.setValue(0)
+
+        with open(setup_path, "wb") as file:
+            for chunk in response.iter_content(block_size):
+                if progress.wasCanceled():
+                    logging.info("Update download canceled.")
+                    return
+
+                file.write(chunk)
+                downloaded_size += len(chunk)
+                progress.setValue(downloaded_size)
+
+        progress.close()
+
+        logging.info(f"Downloaded FastFillSetup.exe to {setup_path}")
+
+        # Execute the installer
+        subprocess.Popen([setup_path], shell=True)
+        sys.exit(0)  # Exit the application after launching the installer
+
+    except Exception as e:
+        logging.error(f"Failed to download update: {e}")
+
+
+def install_update(installer_path):
+    subprocess.Popen([installer_path], shell=True)  # Run installer
+    sys.exit()  # Exit application
 
 
 def isSectionEmpty(config, section):
@@ -181,6 +242,8 @@ class UiDialogMain(object):
 
         self.current_toast = None # Store the toast object of show_toast_notification function
         self.clear_clipboard_timer = None  # Store the QTimer object of button_copy_clicked function
+
+        self.current_field_content = ""
 
         logging.info("setting up UI...")
 
@@ -520,8 +583,21 @@ class UiDialogMain(object):
             self.pushButtonAddTitle.setIconSize(QtCore.QSize(28, 28))
             self.pushButtonAddTitle.setCheckable(False)
             self.pushButtonAddTitle.setObjectName("pushButtonAddTitle")
+            self.pushButtonAddEncTitle = QtWidgets.QPushButton(self.frame_4)
+            self.pushButtonAddEncTitle.setGeometry(QtCore.QRect(180, 2, 41, 41))
+            self.pushButtonAddEncTitle.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            self.pushButtonAddEncTitle.setStyleSheet("QPushButton {\n"
+                                                  "    background-color: #3a3a3c;\n"
+                                                  "    border: 0px solid;\n"
+                                                  "    border-radius: 8px;\n"
+                                                  "}")
+            self.pushButtonAddEncTitle.setText("")
+            self.pushButtonAddEncTitle.setIcon(QtGui.QIcon("_internal/IconAddEnctitle.png"))
+            self.pushButtonAddEncTitle.setIconSize(QtCore.QSize(28, 28))
+            self.pushButtonAddEncTitle.setCheckable(False)
+            self.pushButtonAddEncTitle.setObjectName("pushButtonAddEncTitle")
             self.pushButtonRemoveTitle = QtWidgets.QPushButton(self.frame_4)
-            self.pushButtonRemoveTitle.setGeometry(QtCore.QRect(180, 2, 41, 41))
+            self.pushButtonRemoveTitle.setGeometry(QtCore.QRect(220, 2, 41, 41))
             self.pushButtonRemoveTitle.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
             self.pushButtonRemoveTitle.setStyleSheet("QPushButton {\n"
                                                      "    background-color: #3a3a3c;\n"
@@ -547,7 +623,7 @@ class UiDialogMain(object):
             self.pushButtonRenameCategory.setCheckable(False)
             self.pushButtonRenameCategory.setObjectName("pushButtonRenameCategory")
             self.pushButtonRenameTitle = QtWidgets.QPushButton(self.frame_4)
-            self.pushButtonRenameTitle.setGeometry(QtCore.QRect(220, 2, 41, 41))
+            self.pushButtonRenameTitle.setGeometry(QtCore.QRect(260, 2, 41, 41))
             self.pushButtonRenameTitle.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
             self.pushButtonRenameTitle.setStyleSheet("QPushButton {\n"
                                                      "    background-color: #3a3a3c;\n"
@@ -624,6 +700,7 @@ class UiDialogMain(object):
             self.pushButtonRemoveCategory.clicked.connect(self.remove_category)
             self.pushButtonRenameCategory.clicked.connect(self.rename_category)
             self.pushButtonAddTitle.clicked.connect(self.add_title)
+            self.pushButtonAddEncTitle.clicked.connect(self.add_encrypted_title)
             self.pushButtonRemoveTitle.clicked.connect(lambda: self.remove_title(self.listWidget.currentItem()))
             self.pushButtonRenameTitle.clicked.connect(self.rename_title)
 
@@ -636,16 +713,32 @@ class UiDialogMain(object):
             self.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
             self.listWidget.customContextMenuRequested.connect(self.show_listWidget_contextMenu)
 
+
+
+
             QtCore.QMetaObject.connectSlotsByName(Dialog)
 
             self.retranslateUi(Dialog)
 
             # Create the Tray Icon
             self.create_tray_icon(Dialog)
+
+            self.listWidget.setDragDropMode(QAbstractItemView.InternalMove)
+            self.listWidget.setDefaultDropAction(Qt.MoveAction)
+            self.listWidget.setDragEnabled(True)
+            self.listWidget.setAcceptDrops(True)
+
+            self.listWidgetCategories.setDragDropMode(QAbstractItemView.InternalMove)
+            self.listWidgetCategories.setDefaultDropAction(Qt.MoveAction)
+            self.listWidgetCategories.setDragEnabled(True)
+            self.listWidgetCategories.setAcceptDrops(True)
+
+            self.listWidget.model().rowsMoved.connect(self.save_title_order)
+            self.listWidgetCategories.model().rowsMoved.connect(self.save_category_order)
         except Exception as e:
             logging.error(e)
             QMessageBox.warning(Dialog, "FastFill Error",
-                                "Ein Fehler ist aufgetreten. Bitte versuche die Anwendung neu zu starten.")
+                                QApplication.translate("setupUI", "An error occurred. Try restarting the application."))
 
         logging.info("UI initialized")
 
@@ -674,6 +767,8 @@ class UiDialogMain(object):
                 _translate("Dialog", "Rename category"))
             self.pushButtonRenameTitle.setToolTip(
                 _translate("Dialog", "Rename value/title"))
+            self.pushButtonAddEncTitle.setToolTip(
+                _translate("Dialog", "Add encrypted value/title"))
 
         except Exception as e:
             logging.error(e)
@@ -746,7 +841,7 @@ class UiDialogMain(object):
             <p><a href="https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md" target="_blank">https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md</a></p>
             <br>
             <br>
-            <h3>Version 1.4.1 coded by Paul Koch</h3>
+            <h3>Version 1.5.0 coded by Paul Koch</h3>
             <p>If you have any questions or feedback, feel free to contact me:</p>
             <ul>
             <li><a href="https://github.com/PaulK6803" target="_blank">GitHub Profile: PaulK6803</a></li>
@@ -926,9 +1021,6 @@ class UiDialogMain(object):
             logging.error(e)
 
     def populate_list(self, section):
-        """
-        Populates comboBoxEmails and comboBoxOther using the INI file.
-        """
 
         try:
             self.listWidget.clear()
@@ -944,10 +1036,15 @@ class UiDialogMain(object):
                 if section in config:
                     for key in config[section]:
                         if key.endswith("_title"):
-                            item = QtWidgets.QListWidgetItem(config[section][key])
+                            config_value = config[section][key]
+                            if config_value.endswith("_encrypted"):
+                                config_value = config_value.replace("_encrypted", "")
+                                config_value = config_value + " 🔒"
+                            item = QtWidgets.QListWidgetItem(config_value)
                             item.setSizeHint(QSize(100, 35))
                             item.setTextAlignment(Qt.AlignCenter)
                             self.listWidget.addItem(item)
+
         except ValueError as e:
             logging.error(f"Error populating lists: {e}")
 
@@ -968,21 +1065,53 @@ class UiDialogMain(object):
 
             # Find the corresponding title and content in the selected section
             title = item.text()
+            title = title.replace(" 🔒", "")
             content = ""
+            is_encrypted = False  # to check if the content was originally encrypted
 
             for key in config[current_section]:
-                if key.endswith("_title") and config[current_section][key] == title:
+                config_value = config[current_section][key]  # The original value from config
+
+                if key.endswith("_title") and config_value.replace("_encrypted", "") == title:
                     content_key = key.replace("_title", "_content")  # Get matching content key
                     content = config[current_section].get(content_key, "").strip()  # Fetch content, default to ""
 
                     self.labelShowcaseTitle.setText(title)
+
+                    # Check if the original config value (before _encrypted removal) was encrypted
+                    if config_value.endswith("_encrypted"):
+                        is_encrypted = True
 
                     if not content.strip():  # Check if content is empty or ""
                         self.plainTextEdit.setPlaceholderText(
                             QCoreApplication.translate("update_fields", f"Click on 'Edit' to modify the content"))
                         return
                     else:
+                        # If needed, decrypt content here
+                        if is_encrypted:
+                            self.pushButtonEdit.hide()
+                            self.plainTextEdit.setPlaceholderText(
+                                QCoreApplication.translate("update_fields",
+                                                           f""))
+                            # Ask for password
+                            password, ok = QInputDialog.getText(Dialog, "Encryption Password",
+                                                                QCoreApplication.translate("update_fields", "Enter the password to access this content:"),
+                                                                QLineEdit.Password)
+                            if not ok or not password.strip():
+                                self.plainTextEdit.setPlaceholderText(
+                                    QCoreApplication.translate("update_fields",
+                                                               f"Click on the title again and enter the password to unlock the content"))
+                                return
+                            content = self.decrypt_data(password, content)  # Decrypt config value
+                            if not content:
+                                QMessageBox.critical(Dialog, "Wrong Password", QCoreApplication.translate("update_fields", "Wrong password for this content"))
+                                self.plainTextEdit.setPlaceholderText(
+                                    QCoreApplication.translate("update_fields",
+                                                               f"Click on the title again and enter the password to unlock the content"))
+                                return
+
                         self.plainTextEdit.setPlainText(content)
+                        self.pushButtonEdit.show()
                         return
 
         except Exception as e:
@@ -998,6 +1127,7 @@ class UiDialogMain(object):
             self.pushButtonEditConfirm.setVisible(True)
             self.plainTextEdit.setFrameShape(QFrame.Box)
             self.plainTextEdit.setStyleSheet("border: 2px solid red;")
+            self.current_field_content = self.plainTextEdit.toPlainText()
 
         else:
             self.plainTextEdit.setReadOnly(True)
@@ -1008,50 +1138,88 @@ class UiDialogMain(object):
             self.listWidget.setEnabled(True)
             self.listWidgetCategories.setEnabled(True)
 
-            self.saveFieldsContent()
+            self.save_fields_content()
 
-    def saveFieldsContent(self):
+    def save_fields_content(self):
         """
         Saves the current content of QPlainTextEdit to the correct itemX_content in the config.
+        Ensures that encrypted content remains encrypted and non-encrypted remains non-encrypted.
         """
         try:
             # Get the current text from QPlainTextEdit
             content = self.plainTextEdit.toPlainText()
 
+            if content == self.current_field_content:
+                return
+
             # Get the selected item from the listWidget
             selected_item = self.listWidget.currentItem()
+            if not selected_item:
+                return  # No item selected, nothing to save
 
-            if selected_item:
-                item_title = selected_item.text()  # Get the title of the item
+            item_title = selected_item.text().replace("🔒", "").strip()  # Remove lock emoji if present
 
-                # Get the selected category from listWidgetCategories
-                selected_category_item = self.listWidgetCategories.selectedItems()
+            # Get the selected category from listWidgetCategories
+            selected_category_item = self.listWidgetCategories.selectedItems()
+            if not selected_category_item:
+                return  # No category selected, nothing to save
 
-                if selected_category_item:
-                    category_name = selected_category_item[0].text()  # Get the category name
+            category_name = selected_category_item[0].text().strip()  # Get the category name
 
-                    # Load the config
-                    config = configparser.ConfigParser()
-                    config.read(config_file)
+            # Load the config
+            config = configparser.ConfigParser()
+            config.read(config_file)
 
-                    # Ensure the category exists in the config
-                    if category_name in config.sections():
-                        # Find the key corresponding to the title (e.g., item1_title)
-                        for key in config[category_name]:
-                            if key.endswith("_title") and config[category_name][key] == item_title:
-                                # Create the content key
-                                content_key = key.replace("_title", "_content")
+            if category_name not in config.sections():
+                return  # Category not found in config
 
-                                # Update the content in the config
-                                config.set(category_name, content_key, content)
+            # Find the key corresponding to the title
+            content_key = None
+            is_encrypted = False  # Track if original content was encrypted
 
-                                # Save the updated config
-                                with open(config_file, 'w') as cfg:
-                                    config.write(cfg)
-                                break
+            for key, value in config[category_name].items():
+                if key.endswith("_title"):
+                    # Check for exact match (non-encrypted)
+                    if value == item_title:
+                        content_key = key.replace("_title", "_content")
+                        break
+                    # Check for encrypted match
+                    elif value == item_title + "_encrypted":
+                        if not content:
+                            return
+                        content_key = key.replace("_title", "_content")
+                        is_encrypted = True
+                        break
+
+            if not content_key:
+                return  # Content key not found, nothing to save
+
+            # Encrypt if originally encrypted, otherwise save as plain text
+            if is_encrypted:
+                # Ask for password to encrypt the content
+                password, ok = QtWidgets.QInputDialog.getText(
+                    Dialog, "Encryption Password",
+                    QCoreApplication.translate("saveFieldsContent", "Enter the same or a new password to secure this content:"),
+                    QtWidgets.QLineEdit.Password
+                )
+                if not ok or not password.strip():
+                    return  # User canceled encryption, do not save
+
+                encrypted_content = self.encrypt_data(password, content)
+                config.set(category_name, content_key, encrypted_content)
+                # Save the updated config
+                with open(config_file, 'w') as cfg:
+                    config.write(cfg)
+            else:
+                # Save plain text
+                config.set(category_name, content_key, content)
+                # Save the updated config
+                with open(config_file, 'w') as cfg:
+                    config.write(cfg)
 
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Error saving content: {e}")
+
 
     def show_listWidget_contextMenu(self, pos):
         try:
@@ -1376,6 +1544,79 @@ class UiDialogMain(object):
         except Exception as e:
             logging.error(e)
 
+    def save_category_order(self):
+        """ Saves the new order of categories (sections) to the INI file. """
+        config = configparser.ConfigParser()
+        config.read(config_file)
+
+        # Get new category order from listWidget_2
+        new_order = [self.listWidgetCategories.item(i).text() for i in range(self.listWidgetCategories.count())]
+
+        # Recreate the config with new order
+        new_config = configparser.ConfigParser()
+        for section in new_order:
+            new_config.add_section(section)
+            for key, value in config[section].items():
+                new_config.set(section, key, value)
+
+        # Write back to file
+        with open(config_file, 'w') as cfg:
+            new_config.write(cfg)
+
+    def save_title_order(self):
+        """Saves the new order of items in the selected category to the INI file."""
+
+        try:
+            global current_section
+            config = configparser.ConfigParser()
+            config.read(config_file)
+
+            keys = []
+            for i in range(self.listWidget.count()):
+                item_title = self.listWidget.item(i).text()
+
+                # Check if the title ends with the lock emoji
+                if item_title.endswith("🔒"):
+                    item_title = item_title.replace(" 🔒", "_encrypted")  # Replace lock emoji with _encrypted
+
+                keys.append(item_title)  # Add modified title to the list
+
+            # Create a new ordered dictionary to store the updated key-value pairs
+            new_section_data = {}
+
+            # Iterate through the reordered keys from the QListWidget
+            for index, key in enumerate(keys, 1):  # Start enumeration from 1 for consistency with item numbering
+                # Generate new title and content keys based on their new positions
+                title_key = f"item{index}_title"
+                content_key = f"item{index}_content"
+
+                # Find the original key that matches the current key value and ends with "_title"
+                old_title_key = [
+                    k for k in config[current_section]
+                    if config[current_section][k] == key and k.endswith("_title")
+                ]
+
+                if old_title_key:  # If a matching key is found
+                    # Find the corresponding content key by replacing "_title" with "_content"
+                    old_content_key = old_title_key[0].replace("_title", "_content")
+
+                    # Store the reordered keys and their values in the new dictionary
+                    new_section_data[title_key] = config[current_section][old_title_key[0]]
+                    new_section_data[content_key] = config[current_section][old_content_key]
+
+            # At the end of the loop, new_section_data will contain the reordered key-value pairs
+
+            # Update the section in the config with the new ordered dictionary
+            config[current_section] = new_section_data
+
+            # Save the updated config back to the file
+            with open(config_file, "w") as cfg:
+                config.write(cfg)
+
+        except Exception as e:
+            logging.error(e)
+
+
     def rename_title(self):
         """
         Renames the selected item in listWidget and updates the INI configuration.
@@ -1385,62 +1626,92 @@ class UiDialogMain(object):
         # Get the selected item from the list
         selected_item = self.listWidget.currentItem()
         if not selected_item:
-            QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
-                                                                                      "Please select a value from the list first."))
+            QtWidgets.QMessageBox.warning(
+                Dialog, "Error",
+                QCoreApplication.translate("rename_title", "Please select a title from the list first.")
+            )
             return
 
-        old_title = selected_item.text()  # Get the current title
-
-        # Ask the user for a new name
-        new_title, ok = QtWidgets.QInputDialog.getText(Dialog, "Rename", QCoreApplication.translate("rename_title",
-                                                                                                    "New name for the value:"),
-                                                       text=old_title)
-
-        if not ok or not new_title.strip():  # If cancelled or empty input
-            return
-
-        new_title = new_title.strip()  # Trim spaces
+        old_title = selected_item.text().replace(" 🔒", "")  # Remove lock emoji if present
+        is_encrypted = False  # To track if the content is encrypted
 
         try:
             config = configparser.ConfigParser()
             config.read(config_file)
 
             if current_section not in config.sections():
-                QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
-                                                                                          "The current category was not found."))
+                QtWidgets.QMessageBox.warning(
+                    Dialog, "Error",
+                    QCoreApplication.translate("rename_title", "The current category was not found.")
+                )
                 return
 
             # Find the key for the selected title
             key_to_rename = None
+            content_key = None
+            original_config_value = None
+
             for key, value in config[current_section].items():
-                if key.endswith("_title") and value == old_title:
+                if key.endswith("_title") and value.replace("_encrypted", "") == old_title:
                     key_to_rename = key
+                    original_config_value = value  # Store the original config value
+                    content_key = key.replace("_title", "_content")  # The corresponding content key
                     break
 
             if not key_to_rename:
-                QtWidgets.QMessageBox.warning(Dialog, "Error",
-                                              QCoreApplication.translate("rename_title", "Error renaming the value."))
+                QtWidgets.QMessageBox.warning(
+                    Dialog, "Error",
+                    QCoreApplication.translate("rename_title", "Error renaming the title.")
+                )
                 return
 
-            # Check if the new title already exists
-            existing_titles = [config[current_section][k] for k in config[current_section] if k.endswith("_title")]
-            if new_title in existing_titles:
-                QtWidgets.QMessageBox.warning(Dialog, "Error", QCoreApplication.translate("rename_title",
-                                                                                          "A value with this name already exists."))
+            # Check if the original content is encrypted
+            if original_config_value.endswith("_encrypted"):
+                is_encrypted = True
+
+            # Ask the user for a new name
+            new_title, ok = QtWidgets.QInputDialog.getText(
+                Dialog, "Rename",
+                QCoreApplication.translate("rename_title", "New name for the title:"),
+                text=old_title
+            )
+
+            if not ok or not new_title.strip():  # If cancelled or empty input
                 return
+
+            new_title = new_title.strip()  # Trim spaces
+
+            # Check if the new title already exists
+            existing_titles = [
+                config[current_section][k].replace("_encrypted", "")
+                for k in config[current_section] if k.endswith("_title")
+            ]
+
+            if new_title in existing_titles:
+                QtWidgets.QMessageBox.warning(
+                    Dialog, "Error",
+                    QCoreApplication.translate("rename_title", "A title with this name already exists.")
+                )
+                return
+
+            # Preserve encryption status: if the original title had encrypted content, keep _encrypted
+            if is_encrypted:
+                new_title += "_encrypted"
 
             # Rename the title in the config
             config[current_section][key_to_rename] = new_title
 
-            # Save changes
+            # Save changes to the config
             with open(config_file, 'w') as cfg:
                 config.write(cfg)
 
-            # Update the item in listWidget
-            selected_item.setText(new_title)
+            # Update the GUI (list widget and showcase title)
+            display_title = new_title.replace("_encrypted", "")  # Show title without "_encrypted" in the UI
+            selected_item.setText(display_title + (" 🔒" if is_encrypted else ""))  # Add lock icon if encrypted
+            self.labelShowcaseTitle.setText(display_title)
 
         except Exception as e:
-            logging.error(f"Error in action1 (rename title): {e}")
+            logging.error(f"Error in (rename title): {e}")
             QtWidgets.QMessageBox.warning(Dialog, "Error",
                                           QCoreApplication.translate("rename_title",
                                                                      "An error occurred. Please try restarting the application."))
@@ -1459,6 +1730,8 @@ class UiDialogMain(object):
             return
 
         item_title = selected_item.text()  # Get the title of the selected item
+        if item_title.endswith("🔒"):
+            item_title = item_title.replace(" 🔒", "")  # Remove lock emoji if present
 
         # Confirm deletion
         reply = QtWidgets.QMessageBox.question(Dialog, "remove value", QCoreApplication.translate("remove_title",
@@ -1474,59 +1747,73 @@ class UiDialogMain(object):
             config = configparser.ConfigParser()
             config.read(config_file)
 
-            # Ensure the section exists in the config
             if current_section not in config.sections():
-                QtWidgets.QMessageBox.warning(Dialog, "Error",
-                                              QCoreApplication.translate("remove_title", "Category not found."))
+                QtWidgets.QMessageBox.warning(
+                    Dialog, "Error",
+                    QCoreApplication.translate("remove_title", "The current category was not found.")
+                )
                 return
 
             # Find the key index for the selected title
             key_index_to_remove = None
             for key, value in config[current_section].items():
-                if key.endswith("_title") and value == item_title:
+                if key.endswith("_title") and value == item_title + "_encrypted":
+                    key_index_to_remove = int(key.replace("item", "").replace("_title", ""))
+                    break
+                elif key.endswith("_title") and value == item_title:
                     key_index_to_remove = int(key.replace("item", "").replace("_title", ""))
                     break
 
-            if key_index_to_remove is not None:
-                # Remove the title and its corresponding content
-                config.remove_option(current_section, f"item{key_index_to_remove}_title")
-                config.remove_option(current_section, f"item{key_index_to_remove}_content")
+            if key_index_to_remove is None:
+                QtWidgets.QMessageBox.warning(
+                    Dialog, "Error",
+                    QCoreApplication.translate("remove_title", "Title not found.")
+                )
+                return
 
-                # Collect remaining titles and contents in order
-                items = []
-                for key, value in config[current_section].items():
-                    if key.endswith("_title"):
-                        index = int(key.replace("item", "").replace("_title", ""))
-                        content_key = f"item{index}_content"
-                        content_value = config[current_section].get(content_key,
-                                                                    "")  # Get content (default to empty string)
-                        items.append((index, value, content_value))
+            # Remove the title and its corresponding content
+            config.remove_option(current_section, f"item{key_index_to_remove}_title")
+            config.remove_option(current_section, f"item{key_index_to_remove}_content")
 
-                # Sort by original index to maintain order
-                items.sort()
+            # Collect remaining titles and contents in order
+            items = []
+            for key, value in config[current_section].items():
+                if key.endswith("_title"):
+                    index = int(key.replace("item", "").replace("_title", ""))
+                    content_key = f"item{index}_content"
+                    content_value = config[current_section].get(content_key,
+                                                                "")  # Get content (default to empty string)
+                    items.append((index, value, content_value))
 
-                # Clear the section
-                for key in list(config[current_section].keys()):
-                    config.remove_option(current_section, key)
+            # Sort by original index to maintain order
+            items.sort()
 
-                # Rewrite the keys with updated numbering
-                for new_index, (_, title_value, content_value) in enumerate(items, start=1):
+            # Clear the section
+            for key in list(config[current_section].keys()):
+                config.remove_option(current_section, key)
+
+            # Rewrite the keys with updated numbering
+            for new_index, (_, title_value, content_value) in enumerate(items, start=1):
+                # Preserve _encrypted suffix if needed for the title and content
+                if content_value.endswith("_encrypted"):
+                    config.set(current_section, f"item{new_index}_title", title_value + "_encrypted")
+                else:
                     config.set(current_section, f"item{new_index}_title", title_value)
+
+                # Save content with or without _encrypted as needed
+                if content_value.endswith("_encrypted"):
+                    config.set(current_section, f"item{new_index}_content", content_value)
+                else:
                     config.set(current_section, f"item{new_index}_content", content_value)
 
-                # Save changes to the config file
-                with open(config_file, 'w') as cfg:
-                    config.write(cfg)
+            # Save changes to the config file
+            with open(config_file, 'w') as cfg:
+                config.write(cfg)
 
-                # Remove item from listWidget
-                self.listWidget.takeItem(self.listWidget.row(selected_item))
+            # Remove item from listWidget
+            self.listWidget.takeItem(self.listWidget.row(selected_item))
 
-                logging.info(f"Removed Key / Title: {item_title} from {current_section}.")
-
-            else:
-                QtWidgets.QMessageBox.warning(Dialog, "Error",
-                                              QCoreApplication.translate("remove_title",
-                                                                         "An error occurred. Try restarting the application."))
+            logging.info(f"Removed Key / Title: {item_title} from {current_section}.")
         except Exception as e:
             logging.error(e)
 
@@ -1545,7 +1832,7 @@ class UiDialogMain(object):
 
         # Open a QInputDialog to get the new item's title
         new_title, ok = QInputDialog.getText(Dialog, "New value", QCoreApplication.translate("add_title",
-                                                                                             "Enter the name of the new value:"))
+                                                                                             "Name of the new title:"))
 
         # If user clicked OK and entered a valid title
         if ok and new_title:
@@ -1558,7 +1845,12 @@ class UiDialogMain(object):
             if new_title in existing_titles:
                 QMessageBox.warning(Dialog, "Value already exists",
                                     QCoreApplication.translate("add_title",
-                                                               f"This value already exists in the category") + f"\n\n{current_section}.")
+                                                               f"This title already exists in the category") + f"\n\n{current_section}.")
+                return
+            if new_title + "_encrypted" in existing_titles:
+                QMessageBox.warning(Dialog, "Value already exists",
+                                    QCoreApplication.translate("add_title",
+                                                               f"This title already exists in the category") + f"\n\n{current_section}.")
                 return
 
             # Add the title to the QListWidget
@@ -1586,6 +1878,73 @@ class UiDialogMain(object):
             self.labelNoValuesHint.hide()
 
             logging.info(f"Added new Key / Title: {new_title} to {current_section}")
+
+    def add_encrypted_title(self):
+        global current_section
+        config = configparser.ConfigParser()
+        config.read(config_file)
+
+        if current_section not in config.sections():
+            QMessageBox.warning(Dialog, "Error",
+                                QCoreApplication.translate("add_encrypted_title", "An error occurred. Try restarting the application."))
+            return
+
+        # Get the new title
+        new_title, ok = QInputDialog.getText(Dialog, "New Encrypted Value",
+                                             QCoreApplication.translate("add_encrypted_title", "Name of the new encrypted title:"))
+        if not ok or not new_title.strip():
+            return
+
+        new_title = new_title.strip()
+        existing_titles = [config[current_section][key] for key in config[current_section] if key.endswith("_title")]
+
+        if new_title in existing_titles:
+            QMessageBox.warning(Dialog, "Value already exists",
+                                QCoreApplication.translate("add_encrypted_title", "This title already exists in the currently selected category.") + f"\n\n{current_section}.")
+            return
+
+        if new_title + "_encrypted" in existing_titles:
+            QMessageBox.warning(Dialog, "Value already exists",
+                                QCoreApplication.translate("add_encrypted_title",
+                                                           f"This title already exists in the currently selected category") + f"\n\n{current_section}.")
+            return
+
+        # Get the new content
+        new_content, ok = QInputDialog.getText(Dialog, "New Encrypted Content",
+                                               QCoreApplication.translate("add_encrypted_title", "Enter the content of") + f"\n\n{new_title}")
+        if not ok or not new_content.strip():
+            return
+
+        # Ask for password
+        password, ok = QInputDialog.getText(Dialog, "Encryption Password",
+                                            QCoreApplication.translate("add_encrypted_title", "Enter a password to secure this content:"),
+                                            QLineEdit.Password)
+        if not ok or not password.strip():
+            return
+
+        item = QtWidgets.QListWidgetItem(new_title + " 🔒")  # Indicate encrypted item
+        item.setSizeHint(QSize(100, 35))
+        item.setTextAlignment(Qt.AlignCenter)
+        self.listWidget.addItem(item)
+
+        existing_keys = [key for key in config[current_section] if key.endswith("_title")]
+        new_index = len(existing_keys) + 1
+
+        title_key = f"item{new_index}_title"
+        content_key = f"item{new_index}_content"
+
+        # Encrypt content
+        encrypted_content = self.encrypt_data(password, new_content)
+
+        new_title = new_title + "_encrypted"
+        config[current_section][title_key] = new_title
+        config[current_section][content_key] = encrypted_content
+
+        with open(config_file, 'w') as cfg:
+            config.write(cfg)
+
+        self.labelNoValuesHint.hide()
+        logging.info(f"Added new encrypted Key / Title: {new_title} to {current_section}")
 
     def show_dialog(self):
         """
@@ -1658,6 +2017,78 @@ class UiDialogMain(object):
         self.current_toast.setDurationBarColor(QColor('#31b0ff'))
 
         self.current_toast.show()
+
+    # Generate a strong encryption key from a password
+    def derive_key(self, password: str, salt: bytes) -> bytes:
+        try:
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+                backend=default_backend()
+            )
+            return kdf.derive(password.encode())
+        except Exception as e:
+            logging.error(e)
+
+    # Encrypt datc
+    def encrypt_data(self, password: str, plaintext: str) -> str:
+        try:
+            salt = os.urandom(16)  # Generate a new salt
+            key = self.derive_key(password, salt)
+            iv = os.urandom(16)  # Generate a random IV
+
+            cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+            encryptor = cipher.encryptor()
+
+            # Pad plaintext to be a multiple of 16 bytes (AES block size)
+            padding_length = 16 - (len(plaintext) % 16)
+            padded_plaintext = plaintext + chr(padding_length) * padding_length
+
+            ciphertext = encryptor.update(padded_plaintext.encode()) + encryptor.finalize()
+
+            return base64.b64encode(salt + iv + ciphertext).decode()  # Store salt, iv, and ciphertext together
+        except Exception as e:
+            logging.error(e)
+
+    # Decrypt data
+    def decrypt_data(self, password: str, encrypted_data: str) -> str:
+        try:
+            data = base64.b64decode(encrypted_data)
+            salt, iv, ciphertext = data[:16], data[16:32], data[32:]
+
+            key = self.derive_key(password, salt)
+            cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+            decryptor = cipher.decryptor()
+
+            decrypted_padded = decryptor.update(ciphertext) + decryptor.finalize()
+
+            # Remove padding
+            padding_length = decrypted_padded[-1]
+            return decrypted_padded[:-padding_length].decode()
+        except Exception as e:
+            logging.error(e)
+
+
+class UpdateProgressDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Updating FastFill")
+        self.setFixedSize(300, 150)
+
+        layout = QVBoxLayout(self)
+
+        self.label = QLabel("Downloading update...", self)
+        layout.addWidget(self.label)
+
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setRange(0, 100)
+        layout.addWidget(self.progress_bar)
+
+        self.cancel_button = QPushButton("Cancel", self)
+        self.cancel_button.clicked.connect(self.reject)
+        layout.addWidget(self.cancel_button)
 
 
 if __name__ == '__main__':
