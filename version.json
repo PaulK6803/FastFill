@@ -1,5 +1,5 @@
 {
-    "version": "1.4.1",
-    "new_features_de": "- Einstellungen-Button jetzt funktionsfähig<br><br>- Option, Sprache ändern (Englisch und Deutsch)<br>- Option, FastFill mit Windows zu starten<br>- Option, FastFill minimiert / als Tray-Icon zu starten<br>- Option, die Benachrichtigung, wenn ein Text kopiert wurde ein- oder auszublenden<br><br>- Überarbeitete 'Über'-Info-Box<br>- Benachrichtigung wird angezeigt, wenn ein Text kopiert wurde<br>- Kleinere Bugfixes",
-    "new_features_en": "- Settings Button Now Functional<br><br>- Option to change language (English and German)<br>- Option to start FastFill with Windows bootup<br>- Option to start FastFill minimized / as Tray Icon<br>- Option to toggle the notification when text is copied<br><br>- Revised 'About' Info Box<br>- Notification is shown when text is copied<br>- Minor Bug Fixes"
+    "version": "1.5.0",
+    "new_features_de": "- Verschlüsselte Inhalte für sensible Daten können nun erstellt werden<br><br>- Autoupdate-Funktion integriert<br><br>- Kategorien und Titel können jetzt per Drag & Drop neu angeordnet werden",
+    "new_features_en": "- Encrypted content for sensitive data can now be created<br><br>- Auto-update feature integrated<br><br>- Categories and titles can now be reordered via Drag & Drop"
 }
