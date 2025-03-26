@@ -1,5 +1,5 @@
 {
     "version": "1.4.1",
-    "new_features_de": "- Verschlüsselte Inhalte für sensible Daten können nun erstellt werden<br><br>- Autoupdate-Funktion integriert<br><br>- Kategorien und Titel können jetzt per Drag & Drop neu angeordnet werden<br><br>- Fortschrittsbalken für den Update-Download hinzugefügt<br><br>- Kleinere Bugfixes und Verbesserungen",
-    "new_features_en": "- Encrypted content for sensitive data can now be created<br><br>- Auto-update feature integrated<br><br>- Categories and titles can now be rearranged via drag & drop<br><br>- Progress bar added for update downloads<br><br>- Minor bug fixes and improvements"
+    "new_features_de": "- Verschlüsselte Inhalte für sensible Daten können nun erstellt werden<br><br>- Autoupdate-Funktion integriert<br><br>- Kategorien und Titel können jetzt per Drag & Drop neu angeordnet werden<br><br>- Kleinere Bugfixes und Verbesserungen",
+    "new_features_en": "- Encrypted content for sensitive data can now be created<br><br>- Auto-update feature integrated<br><br>- Categories and titles can now be rearranged via drag & drop<br><br>- Minor bug fixes and improvements"
 }
