@@ -29,6 +29,7 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 
 (planned)
 - **Dark Mode**
+- **Hotkey, to open FastFill-Dialog or to bring it to the front if hidden.**
 - **bug fixes**
 
 ---
