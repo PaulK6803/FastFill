@@ -1,5 +1,5 @@
 {
-    "version": "1.5.0",
-    "new_features_de": "- Verschlüsselte Inhalte für sensible Daten können nun erstellt werden<br><br>- Autoupdate-Funktion integriert<br><br>- Kategorien und Titel können jetzt per Drag & Drop neu angeordnet werden",
-    "new_features_en": "- Encrypted content for sensitive data can now be created<br><br>- Auto-update feature integrated<br><br>- Categories and titles can now be reordered via Drag & Drop"
+    "version": "1.5.1",
+    "new_features_de": "- Problem behoben, dass das Tray-Icon beim Start mit Windows nicht erschien<br><br>- Problem behoben, dass die Update-Benachrichtigung (QMessageBox) nicht angezeigt wurde",
+    "new_features_en": "- Fixed issue where the tray icon would not appear when starting with Windows<br><br>- Fixed issue where the update notification (QMessageBox) was not displayed"
 }
