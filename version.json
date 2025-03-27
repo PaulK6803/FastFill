@@ -1,5 +1,5 @@
 {
     "version": "1.5.1",
-    "new_features_de": "- Problem behoben, dass das Tray-Icon beim Start mit Windows nicht erschien<br><br>- Problem behoben, dass die Update-Benachrichtigung (QMessageBox) nicht angezeigt wurde",
-    "new_features_en": "- Fixed issue where the tray icon would not appear when starting with Windows<br><br>- Fixed issue where the update notification (QMessageBox) was not displayed"
+    "new_features_de": "- Problem behoben, dass das Tray-Icon beim Start mit Windows nicht erschien<br><br>- Problem behoben, dass die Update-Benachrichtigung nicht angezeigt wurde",
+    "new_features_en": "- Fixed issue where the tray icon would not appear when starting with Windows<br><br>- Fixed issue where the update notification was not displayed"
 }
