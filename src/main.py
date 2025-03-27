@@ -11,6 +11,7 @@ from pathlib import Path
 import configparser
 import os
 import sys
+import win32com.client
 
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -19,9 +20,10 @@ from cryptography.hazmat.backends import default_backend
 import base64
 
 from PyQt5.QtGui import QBrush, QColor, QIcon
-from PyQt5.QtCore import QTimer, Qt, QSize, QPoint, QCoreApplication, QTranslator, QSettings
+from PyQt5.QtCore import QTimer, Qt, QSize, QPoint, QCoreApplication, QTranslator, QSettings, QPropertyAnimation, \
+    QEasingCurve
 from PyQt5.QtWidgets import QDialog, QApplication, QSystemTrayIcon, QMenu, QAction, QInputDialog, QFrame, QLineEdit, \
-    QVBoxLayout, QLabel, QProgressBar, QPushButton, QProgressDialog, QAbstractItemView
+    QVBoxLayout, QLabel, QProgressBar, QPushButton, QProgressDialog, QAbstractItemView, QWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
@@ -139,7 +141,7 @@ def check_for_update():
             logging.info(f"Current installed version: {__version__}")
             logging.info(f"New version available: {latest_version}")
             if Dialog.isVisible():
-                updateWindow = QMessageBox(None)
+                updateWindow = QMessageBox(Dialog)
                 updateWindow.setWindowTitle(QCoreApplication.translate("UpdateWindow", "FastFill Update available"))
                 updateWindow.setTextFormat(Qt.RichText)
                 updateWindow.setText(QCoreApplication.translate("UpdateWindow",
@@ -161,7 +163,6 @@ def check_for_update():
                     pass
             else:
                 pass
-                # displayNotification("FastFill Update", f"Version {latest_version} is available.", 5)
         else:
             logging.info(f"Current installed version: {__version__}")
             logging.info(f"Github version: {latest_version}")
@@ -720,9 +721,6 @@ class UiDialogMain(object):
 
             self.retranslateUi(Dialog)
 
-            # Create the Tray Icon
-            self.create_tray_icon(Dialog)
-
             self.listWidget.setDragDropMode(QAbstractItemView.InternalMove)
             self.listWidget.setDefaultDropAction(Qt.MoveAction)
             self.listWidget.setDragEnabled(True)
@@ -841,7 +839,7 @@ class UiDialogMain(object):
             <p><a href="https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md" target="_blank">https://github.com/PaulK6803/FastFill/blob/main/Privacy_Policy_and_Disclaimer.md</a></p>
             <br>
             <br>
-            <h3>Version 1.5.0 coded by Paul Koch</h3>
+            <h3>Version 1.5.1 coded by Paul Koch</h3>
             <p>If you have any questions or feedback, feel free to contact me:</p>
             <ul>
             <li><a href="https://github.com/PaulK6803" target="_blank">GitHub Profile: PaulK6803</a></li>
@@ -1377,17 +1375,24 @@ class UiDialogMain(object):
     def start_with_windows(self, enable, settings):
         """Enable or disable starting FastFill with Windows."""
         try:
-            exe_path = os.path.abspath(sys.argv[0])  # Get the path of the running FastFill.exe
-            registry_key = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_key, 0, winreg.KEY_ALL_ACCESS) as key:
-                if enable:
-                    winreg.SetValueEx(key, "FastFill", 0, winreg.REG_SZ, exe_path)
-                else:
-                    try:
-                        winreg.DeleteValue(key, "FastFill")
-                    except FileNotFoundError:
-                        pass  # If it doesn't exist, ignore it
+            startup_folder = os.path.join(os.getenv('APPDATA'), r'Microsoft\Windows\Start Menu\Programs\Startup')
+            shortcut_path = os.path.join(startup_folder, "FastFill.lnk")
+            exe_path = os.path.abspath(sys.argv[0])  # Get the path of FastFill.exe
+
+            shell = win32com.client.Dispatch("WScript.Shell")
+
+            if enable:
+                # Create shortcut
+                shortcut = shell.CreateShortcut(shortcut_path)
+                shortcut.TargetPath = exe_path
+                shortcut.WorkingDirectory = os.path.dirname(exe_path)
+                shortcut.Arguments = "--minimized"  # Start minimized
+                shortcut.Save()
+            else:
+                # Remove the shortcut if it exists
+                if os.path.exists(shortcut_path):
+                    os.remove(shortcut_path)
 
             # Save setting
             settings.setValue("App/start_with_windows", enable)
@@ -1991,7 +1996,10 @@ class UiDialogMain(object):
         try:
             logging.info("restarting Application...")
             logging.info("opening new exe...")
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            exe_path = os.path.abspath(sys.argv[0])  # Get the path of FastFill.exe
+            subprocess.Popen([exe_path], shell=True)  # Run exe
+            sys.exit()
+            # os.execl(sys.executable, sys.executable, *sys.argv)
         except Exception as e:
             logging.error(e)
 
@@ -2102,13 +2110,22 @@ if __name__ == '__main__':
         ui = UiDialogMain()
         ui.setupUi(Dialog)
         ui.dialog = Dialog  # saves the Dialog-Object
+
+        # Create tray icon (this should happen after setting up the dialog)
+        ui.create_tray_icon(Dialog)
+
+
         if not start_minimized:
             Dialog.show()
+
         logging.info("FastFill application started.")  #
+
         check_for_update()
+
         sys.exit(app.exec_())
     except Exception as e:
         logging.error(e)
+
 
 
 
