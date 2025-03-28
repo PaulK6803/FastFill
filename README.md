@@ -29,6 +29,8 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 
 (planned)
 - **Hotkey, to open FastFill-Dialog or to bring it to the front if hidden.**
+- **Rich Text Support**
+- **Cloud Sync Integration**
 - **bug fixes**
 
 ---
