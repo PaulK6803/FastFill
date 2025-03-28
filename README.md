@@ -22,9 +22,9 @@ FastFill allows you to efficiently manage frequently used texts and copy them di
 - 📝 **Manage text entries** – Add, remove, reorder, and rename saved texts  
 - ⚙️ **Customizable settings** – Customizable settings designed for an intuitive and user-friendly experience  
 - 🎛 **System tray integration** – Quickly open, close, or restart the app  
-- 🔒 **Encrypted content** – Create encrypted content for sensitive data  
+- 🔒 **Encrypted content** – Create encrypted / password protected content for sensitive data  
 - 🔄 **Auto-update** – Integrated feature to automatically update the app  
-- 🔀 **Drag & Drop** – Categories and titles can now be reordered via Drag & Drop
+- 🔀 **Drag & Drop** – Categories and titles can be reordered via Drag & Drop
 
 
 (planned)
